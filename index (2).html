@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>U.S. Unemployment Risk Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 56px;
+  }
+  .nav-brand { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .nav-links { display: flex; gap: 0; }
+  .nav-links a {
+    color: var(--muted); font-size: 13px; text-decoration: none;
+    padding: 0 14px; height: 56px; display: flex; align-items: center;
+    border-bottom: 2px solid transparent; transition: color .15s, border-color .15s;
+  }
+  .nav-links a:hover { color: var(--text); border-bottom-color: var(--border); }
+  .nav-links a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* SECTIONS */
+  section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+  section + section { border-top: 1px solid var(--border); }
+
+  /* INTRO */
+  #intro { padding-top: 6rem; }
+  .intro-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  h1 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 1.25rem; }
+  .intro-sub { font-size: 17px; color: var(--muted); max-width: 640px; line-height: 1.7; margin-bottom: 2.5rem; }
+  .stat-row { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2.5rem; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.25rem 1.5rem; min-width: 150px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .stat-value.blue { color: var(--accent); }
+  .stat-value.green { color: var(--accent2); }
+
+  /* MAP SECTION */
+  #map-section { max-width: 1300px; }
+  .map-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+  .map-title { font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+  .map-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+  .controls-row {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 1.5rem;
+  }
+  .ctrl-label { font-size: 12px; color: var(--muted); letter-spacing: .04em; margin-right: 4px; }
+  select {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px; padding: 6px 10px;
+    font-size: 13px; cursor: pointer; outline: none;
+  }
+  select:focus { border-color: var(--accent); }
+  .divider { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+
+  .time-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px 10px; margin-bottom: 1.5rem;
+  }
+  .time-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .time-current { font-size: 16px; font-weight: 600; color: var(--accent); letter-spacing: -.01em; }
+  .play-btn {
+    background: none; border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: background .15s;
+  }
+  .play-btn:hover { background: var(--surface2); }
+  input[type=range] {
+    width: 100%; height: 4px; accent-color: var(--accent);
+    cursor: pointer; margin-top: 4px;
+  }
+  .time-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  /* MAP LAYOUT */
+  .map-layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; }
+  @media (max-width: 1024px) { .map-layout { grid-template-columns: 1fr; } }
+
+  .map-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem; overflow: hidden; position: relative;
+  }
+  .map-card-title {
+    font-size: 12px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  }
+  svg.map-svg { width: 100%; height: auto; display: block; }
+
+  /* LEGEND */
+  .legend-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 11px; color: var(--muted); }
+  .legend-bar {
+    flex: 1; height: 8px; border-radius: 4px;
+    background: linear-gradient(to right, #0d2b4e, #1a5276, #2e86c1, #f39c12, #e74c3c);
+  }
+
+  /* TOOLTIP */
+  #tooltip {
+    position: fixed; background: rgba(22,27,34,0.97);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 16px; font-size: 12px; pointer-events: none;
+    z-index: 1000; min-width: 210px; display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .tt-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .tt-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+  .tt-key { color: var(--muted); }
+  .tt-val { color: var(--text); font-weight: 500; }
+  .tt-badge {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 4px; letter-spacing: .04em;
+  }
+  .badge-pred { background: #1a3a5c; color: var(--accent); }
+  .badge-obs { background: #1a3a1a; color: var(--accent2); }
+
+  /* METHODS */
+  .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+  .method-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem;
+  }
+  .method-icon { font-size: 20px; margin-bottom: 12px; }
+  .method-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; letter-spacing: -.01em; }
+  .method-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .formula {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px; font-family: 'SF Mono', monospace;
+    font-size: 12px; color: var(--accent2); margin-top: 10px; line-height: 1.8;
+  }
+
+  /* DOWNLOAD */
+  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .dl-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px;
+  }
+  .dl-card h3 { font-size: 14px; font-weight: 600; }
+  .dl-card p { font-size: 12px; color: var(--muted); line-height: 1.6; flex: 1; }
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent); color: #0d1117;
+    border: none; border-radius: 6px; padding: 8px 16px;
+    font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none;
+    transition: opacity .15s; width: fit-content;
+  }
+  .dl-btn:hover { opacity: .85; }
+
+  /* SECTION HEADERS */
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: .75rem; }
+  h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 700; letter-spacing: -.025em; margin-bottom: .5rem; }
+  .section-sub { font-size: 15px; color: var(--muted); margin-bottom: 2rem; max-width: 620px; }
+
+  .loading { display: flex; align-items: center; justify-content: center; height: 300px; color: var(--muted); font-size: 14px; }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin-right: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">U.S. Unemployment Risk</div>
+  <div class="nav-links">
+    <a href="#intro" class="active">Overview</a>
+    <a href="#map-section">Map</a>
+    <a href="#methods">Methods</a>
+    <a href="#download">Data</a>
+  </div>
+</nav>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="intro-label">National County-Level Dataset</div>
+  <h1>Unemployment Risk<br>Across America</h1>
+  <p class="intro-sub">
+    A county × industry panel dataset covering all 50 states and 20 NAICS sectors from 2019–2024.
+    Where state agencies do not report claims, values are imputed using a hurdle model trained on
+    observed states, with confidence scores quantifying prediction reliability.
+  </p>
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Counties</div>
+      <div class="stat-value blue">3,143</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">NAICS Sectors</div>
+      <div class="stat-value blue">19</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Observed States</div>
+      <div class="stat-value green">28</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Imputed States</div>
+      <div class="stat-value" style="color:#f0883e">22</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Time Span</div>
+      <div class="stat-value" style="color:var(--muted)">2019–2024</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section id="map-section">
+  <div class="section-label">Interactive Explorer</div>
+  <div class="map-header">
+    <div>
+      <div class="map-title">County Unemployment Risk Map</div>
+      <div class="map-subtitle">Hover or click any county for details</div>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <span class="ctrl-label">SECTOR</span>
+    <select id="sector-select">
+      <option value="ALL">All Sectors (Total)</option>
+      <option value="11">11 — Agriculture</option>
+      <option value="21">21 — Mining</option>
+      <option value="22">22 — Utilities</option>
+      <option value="23">23 — Construction</option>
+      <option value="31">31 — Manufacturing</option>
+      <option value="42">42 — Wholesale Trade</option>
+      <option value="44">44 — Retail Trade</option>
+      <option value="48">48 — Transportation</option>
+      <option value="51">51 — Information</option>
+      <option value="52">52 — Finance &amp; Insurance</option>
+      <option value="53">53 — Real Estate</option>
+      <option value="54">54 — Professional Services</option>
+      <option value="56">56 — Administrative</option>
+      <option value="61">61 — Education</option>
+      <option value="62">62 — Health Care</option>
+      <option value="71">71 — Arts &amp; Entertainment</option>
+      <option value="72">72 — Accommodation &amp; Food</option>
+      <option value="81">81 — Other Services</option>
+      <option value="92">92 — Public Administration</option>
+    </select>
+    <div class="divider"></div>
+    <span class="ctrl-label">VIEW</span>
+    <select id="map-view-select">
+      <option value="risk">Unemployment Risk</option>
+      <option value="reliability">Data Reliability</option>
+    </select>
+  </div>
+
+  <div class="time-row" id="time-controls">
+    <div class="time-top">
+      <span class="ctrl-label">TIME PERIOD</span>
+      <span class="time-current" id="time-display">2019-01</span>
+      <button class="play-btn" id="play-btn">▶ Play</button>
+    </div>
+    <input type="range" id="time-slider" min="0" max="71" value="0" step="1">
+    <div class="time-labels">
+      <span>Jan 2019</span><span>Jan 2020</span><span>Jan 2021</span>
+      <span>Jan 2022</span><span>Jan 2023</span><span>Jan 2024</span><span>Dec 2024</span>
+    </div>
+  </div>
+
+  <div class="map-layout">
+    <div class="map-card" id="main-map-card">
+      <div class="map-card-title" id="main-map-label">Unemployment Risk</div>
+      <div class="loading" id="map-loading"><div class="spinner"></div>Loading map data…</div>
+      <svg class="map-svg" id="main-map" viewBox="0 0 960 600" style="display:none"></svg>
+      <div class="legend-row">
+        <span>0%</span>
+        <div class="legend-bar" id="main-legend-bar"></div>
+        <span id="legend-max">25%+</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <div class="map-card" id="side-map-card">
+        <div class="map-card-title">Data Reliability</div>
+        <svg class="map-svg" id="side-map" viewBox="0 0 960 600" style="display:none"></svg>
+        <div class="loading" id="side-loading"><div class="spinner"></div>Loading…</div>
+        <div style="margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.7;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:#3fb950"></div>
+            Observed data
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:#1e3a5f"></div>
+            Low confidence (imputed)
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:#58a6ff"></div>
+            High confidence (imputed)
+          </div>
+        </div>
+      </div>
+
+      <div class="map-card" style="flex:1">
+        <div class="map-card-title">County Summary</div>
+        <div id="county-detail" style="font-size:13px; color: var(--muted); line-height:1.8; padding-top:4px;">
+          Click any county on the map to see details here.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHODS -->
+<section id="methods">
+  <div class="section-label">Methodology</div>
+  <h2>How We Built This Dataset</h2>
+  <p class="section-sub">
+    Unemployment risk is estimated at the county × industry × month level. For states that do not
+    report claims data, a hurdle model predicts values, with uncertainty quantified by a confidence score.
+  </p>
+
+  <div class="method-grid">
+    <div class="method-card">
+      <div class="method-icon">📊</div>
+      <h3>Unemployment Risk</h3>
+      <p>
+        Rather than raw claim counts, we compute unemployment risk as a normalized measure of labor
+        market stress within each county-industry cell. This makes values comparable across counties
+        of different sizes.
+      </p>
+      <div class="formula">
+        Unemployment Risk =<br>
+        UI Claims / (UI Claims + Employment)
+      </div>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon">🗺️</div>
+      <h3>Data Sources</h3>
+      <p>
+        Observed UI claims come from 28 state workforce agencies. Employment denominators are sourced
+        from the BLS Quarterly Census of Employment and Wages (QCEW), aggregated to monthly counts.
+        Demographic covariates come from Census ACS 5-year estimates (DP03 profile variables, 2015–2023).
+      </p>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon">🤖</div>
+      <h3>Imputation Model</h3>
+      <p>
+        For the 22 states without observed claims, we use a two-stage hurdle model: a logistic
+        classifier predicts whether a county-sector cell has any claims in a given month; a count
+        regression then estimates the magnitude. The model is validated via Leave-One-State-Out (LOSO)
+        cross-validation.
+      </p>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon">🎯</div>
+      <h3>Confidence Scores</h3>
+      <p>
+        Because imputed states have no ground truth, confidence is estimated entirely from predicted
+        outputs — never from actual counts. Four signals are combined:
+      </p>
+      <div class="formula">
+        Score = 0.5 × ratio<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.3 × p_positive<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.1 × zero_rate<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.1 × entropy
+      </div>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon">✅</div>
+      <h3>Missing Value Flags</h3>
+      <p>
+        The dataset distinguishes between two types of missing values: states for which data simply
+        does not exist, and states that explicitly declined to share their data. Each is given a
+        distinct flag so downstream users can filter appropriately.
+      </p>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon">📎</div>
+      <h3>NAICS Sector Grouping</h3>
+      <p>
+        Industries are reported at the 2-digit NAICS level. Sectors 32/33 are merged into 31
+        (Manufacturing); 45 into 44 (Retail Trade); 49 into 48 (Transportation) to ensure consistent
+        cell coverage across states and time periods.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download">
+  <div class="section-label">Data Access</div>
+  <h2>Download the Dataset</h2>
+  <p class="section-sub">
+    The full panel dataset is available as a flat CSV. Code to reproduce the pipeline from raw inputs
+    is provided in a single reproducible notebook.
+  </p>
+  <div class="dl-grid">
+    <div class="dl-card">
+      <h3>📦 Full Dataset (CSV)</h3>
+      <p>All counties, all sectors, 2019–2024. Includes unemployment risk, confidence scores, and
+      source flags. ~200 MB.</p>
+      <a class="dl-btn" href="data/fake_data.csv" download>↓ Download CSV</a>
+    </div>
+    <div class="dl-card">
+      <h3>📓 Replication Notebook</h3>
+      <p>End-to-end Python notebook: data ingestion, QCEW employment merge, ACS features, hurdle
+      model training, and confidence scoring.</p>
+      <a class="dl-btn" href="#" style="background: var(--surface2); color: var(--text); border: 1px solid var(--border);">Coming soon</a>
+    </div>
+    <div class="dl-card">
+      <h3>📄 Data Dictionary</h3>
+      <p>Column definitions, NAICS sector codes, flag values, and units. Updated with each data release.</p>
+      <a class="dl-btn" href="#" style="background: var(--surface2); color: var(--text); border: 1px solid var(--border);">Coming soon</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built with D3.js · Data: BLS QCEW, Census ACS, State UI Agencies · Last updated 2024
+</footer>
+
+<div id="tooltip">
+  <div class="tt-title" id="tt-geoid">—</div>
+  <div class="tt-row"><span class="tt-key">Date</span><span class="tt-val" id="tt-date">—</span></div>
+  <div class="tt-row"><span class="tt-key">Sector</span><span class="tt-val" id="tt-sector">—</span></div>
+  <div class="tt-row"><span class="tt-key">Unemployment Risk</span><span class="tt-val" id="tt-risk">—</span></div>
+  <div class="tt-row"><span class="tt-key">Confidence Score</span><span class="tt-val" id="tt-conf">—</span></div>
+  <div class="tt-row"><span class="tt-key">Source</span><span class="tt-val" id="tt-pred">—</span></div>
+</div>
+
+<script>
+const MONTHS = [];
+for (let y = 2019; y <= 2024; y++)
+  for (let m = 1; m <= 12; m++)
+    MONTHS.push(`${y}-${String(m).padStart(2,'0')}`);
+
+const NAICS_NAMES = {
+  '11':'Agriculture','21':'Mining','22':'Utilities','23':'Construction',
+  '31':'Manufacturing','42':'Wholesale Trade','44':'Retail Trade',
+  '48':'Transportation','51':'Information','52':'Finance',
+  '53':'Real Estate','54':'Professional Services','56':'Administrative',
+  '61':'Education','62':'Health Care','71':'Arts','72':'Accommodation',
+  '81':'Other Services','92':'Public Administration'
+};
+
+let dataByGeoDate = {};
+let topoData = null;
+let currentIdx = 0;
+let currentSector = 'ALL';
+let playInterval = null;
+let isPlaying = false;
+
+const slider = document.getElementById('time-slider');
+const timeDisplay = document.getElementById('time-display');
+const playBtn = document.getElementById('play-btn');
+const sectorSel = document.getElementById('sector-select');
+const viewSel = document.getElementById('map-view-select');
+const tooltip = document.getElementById('tooltip');
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(l => {
+    const vals = l.split(',');
+    const obj = {};
+    headers.forEach((h, i) => obj[h.trim()] = vals[i] ? vals[i].trim() : '');
+    return obj;
+  });
+}
+
+function buildIndex(rows) {
+  rows.forEach(r => {
+    const key = `${r.GEOID}_${r.DATE}_${r.Sector}`;
+    dataByGeoDate[key] = r;
+  });
+}
+
+function getVal(geoid, date, sector) {
+  if (sector === 'ALL') {
+    let sum = 0, count = 0, anyPred = false, confSum = 0, confCount = 0;
+    Object.keys(NAICS_NAMES).forEach(s => {
+      const r = dataByGeoDate[`${geoid}_${date}_${s}`];
+      if (r) {
+        sum += parseFloat(r.Unemployment_Risk) || 0;
+        count++;
+        if (r.If_predict === 'True') { anyPred = true; if (r.Confidence_Score) { confSum += parseFloat(r.Confidence_Score); confCount++; } }
+      }
+    });
+    return count > 0 ? { risk: sum/count, pred: anyPred, conf: confCount > 0 ? confSum/confCount : null } : null;
+  }
+  const r = dataByGeoDate[`${geoid}_${date}_${sector}`];
+  if (!r) return null;
+  return { risk: parseFloat(r.Unemployment_Risk)||0, pred: r.If_predict==='True', conf: r.Confidence_Score ? parseFloat(r.Confidence_Score) : null };
+}
+
+const riskScale = d3.scaleSequential()
+  .domain([0, 0.25])
+  .interpolator(t => d3.interpolateRgbBasis(['#0d2b4e','#1a5276','#2e86c1','#f39c12','#e74c3c'])(t));
+
+function reliabilityColor(val) {
+  if (!val) return '#2c2c2c';
+  if (!val.pred) return '#1a3a1a';
+  const c = val.conf !== null ? val.conf : 0.5;
+  return d3.interpolateRgb('#1e3a5f','#58a6ff')(c);
+}
+
+function drawMap(svgId, projection, path, counties, statesLine, date, sector, mode) {
+  const svg = d3.select('#' + svgId);
+  svg.selectAll('*').remove();
+
+  svg.append('g').selectAll('path')
+    .data(counties.features)
+    .join('path')
+    .attr('d', path)
+    .attr('fill', d => {
+      const val = getVal(d.id, date, sector);
+      if (mode === 'reliability') return val ? reliabilityColor(val) : '#1a1a1a';
+      return val ? riskScale(val.risk) : '#1a1a1a';
+    })
+    .attr('stroke', '#1a1a1a')
+    .attr('stroke-width', 0.3)
+    .on('mousemove', function(event, d) {
+      const val = getVal(d.id, date, sector);
+      document.getElementById('tt-geoid').textContent = `County ${d.id}`;
+      document.getElementById('tt-date').textContent = date;
+      document.getElementById('tt-sector').textContent = sector === 'ALL' ? 'All Sectors' : `${sector} — ${NAICS_NAMES[sector]||''}`;
+      document.getElementById('tt-risk').textContent = val ? (val.risk*100).toFixed(2) + '%' : 'N/A';
+      document.getElementById('tt-conf').textContent = val && val.conf !== null ? val.conf.toFixed(3) : (val && !val.pred ? 'N/A (observed)' : 'N/A');
+      const predEl = document.getElementById('tt-pred');
+      predEl.innerHTML = val ? (val.pred ? '<span class="tt-badge badge-pred">Imputed</span>' : '<span class="tt-badge badge-obs">Observed</span>') : '—';
+      tooltip.style.display = 'block';
+      tooltip.style.left = Math.min(event.clientX + 14, window.innerWidth - 230) + 'px';
+      tooltip.style.top = Math.min(event.clientY - 10, window.innerHeight - 180) + 'px';
+    })
+    .on('mouseleave', () => { tooltip.style.display = 'none'; })
+    .on('click', function(event, d) {
+      const val = getVal(d.id, date, sector);
+      const el = document.getElementById('county-detail');
+      if (!val) { el.innerHTML = `<b>County ${d.id}</b><br>No data for this selection.`; return; }
+      el.innerHTML = `
+        <b style="color:var(--text)">County GEOID: ${d.id}</b><br>
+        Date: ${date}<br>
+        Sector: ${sector === 'ALL' ? 'All (avg)' : sector + ' — ' + NAICS_NAMES[sector]}<br>
+        Unemployment Risk: <b style="color:var(--accent)">${(val.risk*100).toFixed(2)}%</b><br>
+        ${val.conf !== null ? `Confidence Score: <b style="color:var(--accent2)">${val.conf.toFixed(3)}</b><br>` : ''}
+        Source: ${val.pred ? '<span style="color:#58a6ff">Imputed</span>' : '<span style="color:#3fb950">Observed</span>'}
+      `;
+    });
+
+  svg.append('path')
+    .datum(statesLine)
+    .attr('d', path)
+    .attr('fill', 'none')
+    .attr('stroke', '#58a6ff')
+    .attr('stroke-width', 1.0)
+    .attr('opacity', 0.6);
+}
+
+function update() {
+  const date = MONTHS[currentIdx];
+  timeDisplay.textContent = date;
+  const sector = currentSector;
+  const mode = viewSel.value;
+  if (topoData) {
+    const proj = d3.geoAlbersUsa().scale(1280).translate([480, 300]);
+    const path = d3.geoPath().projection(proj);
+    const counties = topojson.feature(topoData, topoData.objects.counties);
+    const statesLine = topojson.mesh(topoData, topoData.objects.states, (a,b) => a !== b);
+    drawMap('main-map', proj, path, counties, statesLine, date, sector, mode);
+    drawMap('side-map', proj, path, counties, statesLine, date, sector, 'reliability');
+  }
+}
+
+async function init() {
+  const [topoRes, csvRes] = await Promise.all([
+    fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json'),
+    fetch('fake_data.csv')
+  ]);
+  topoData = await topoRes.json();
+  const csvText = await csvRes.text();
+  const rows = parseCSV(csvText);
+  buildIndex(rows);
+
+  document.getElementById('map-loading').style.display = 'none';
+  document.getElementById('side-loading').style.display = 'none';
+  document.getElementById('main-map').style.display = 'block';
+  document.getElementById('side-map').style.display = 'block';
+
+  update();
+}
+
+slider.addEventListener('input', () => { currentIdx = +slider.value; update(); });
+sectorSel.addEventListener('change', () => { currentSector = sectorSel.value; update(); });
+viewSel.addEventListener('change', update);
+
+playBtn.addEventListener('click', () => {
+  if (isPlaying) {
+    clearInterval(playInterval); isPlaying = false; playBtn.textContent = '▶ Play';
+  } else {
+    isPlaying = true; playBtn.textContent = '⏸ Pause';
+    playInterval = setInterval(() => {
+      currentIdx = (currentIdx + 1) % MONTHS.length;
+      slider.value = currentIdx;
+      update();
+      if (currentIdx === MONTHS.length - 1) { clearInterval(playInterval); isPlaying = false; playBtn.textContent = '▶ Play'; }
+    }, 200);
+  }
+});
+
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', function() {
+    document.querySelectorAll('.nav-links a').forEach(x => x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
