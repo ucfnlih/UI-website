@@ -375,17 +375,17 @@ function drawMap(svgId, counties, statesLine, path, date, sector, mode){
   svg.append('g').selectAll('path').data(counties.features).join('path')
     .attr('d',path)
     .attr('fill',d=>{
-      const v=getVal(d.id,date,sector);
+      const v=getVal(String(d.id).padStart(5,'0'),date,sector);
       if(!v) return '#1a1a1a';
       return mode==='reliability'?reliabilityColor(v):riskScale(v.risk);
     })
     .attr('stroke','#111').attr('stroke-width',0.25)
     .on('click',function(event,d){
-      const v=getVal(d.id,date,sector);
+      const v=getVal(String(d.id).padStart(5,'0'),date,sector);
       const el=document.getElementById('county-detail');
-      const stateFips=d.id.substring(0,2);
+      const gid=String(d.id).padStart(5,'0');const stateFips=gid.substring(0,2);
       const stateName=STATE_NAMES[stateFips]||stateFips;
-      if(!v){el.innerHTML=`<div style="color:var(--muted)">No data for county ${d.id}</div>`;return;}
+      if(!v){el.innerHTML=`<div style="color:var(--muted)">No data for county ${gid}</div>`;return;}
       el.innerHTML=`
         <div class="detail-row"><span class="detail-key">GEOID</span><span class="detail-val">${d.id}</span></div>
         <div class="detail-row"><span class="detail-key">State</span><span class="detail-val">${stateName}</span></div>
