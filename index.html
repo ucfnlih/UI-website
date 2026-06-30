@@ -108,6 +108,35 @@ h2{font-size:clamp(1.5rem,2.5vw,2rem);font-weight:700;letter-spacing:-.025em;mar
 .badge-pred{background:#1a3a5c;color:var(--accent);}
 .badge-obs{background:#1a3a1a;color:var(--accent2);}
 
+
+/* NARRATIVES */
+.narrative-block{margin-bottom:1rem;}
+.narrative-block-header{margin-bottom:2rem;}
+.narrative-block-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:1rem;}
+.tag-state{background:rgba(167,139,250,0.15);color:#a78bfa;border:1px solid rgba(167,139,250,0.3);}
+.tag-county{background:rgba(88,166,255,0.15);color:var(--accent);border:1px solid rgba(88,166,255,0.3);}
+.narrative-block-title{font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;}
+.narrative-block-sub{font-size:14px;color:var(--muted);max-width:600px;}
+
+.case-card{display:grid;grid-template-columns:1.3fr 1fr;gap:2rem;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.75rem;margin-bottom:1.5rem;}
+.case-card.reverse{grid-template-columns:1fr 1.3fr;}
+.case-card.reverse .case-img-wrap{order:2;}
+.case-card.reverse .case-text{order:1;}
+@media(max-width:860px){
+  .case-card,.case-card.reverse{grid-template-columns:1fr;}
+  .case-card.reverse .case-img-wrap,.case-card.reverse .case-text{order:initial;}
+}
+.case-img-wrap{background:#ffffff;border-radius:10px;padding:1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,0,0,0.25);}
+.case-img{width:100%;height:auto;display:block;border-radius:4px;}
+.case-num{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}
+.case-text p{font-size:14px;color:var(--text);line-height:1.75;}
+
+.case-card-placeholder{background:var(--surface2);border:1px dashed var(--border);border-radius:14px;padding:2rem;margin-bottom:1.5rem;}
+
+.narrative-divider{display:flex;align-items:center;gap:16px;margin:3.5rem 0;}
+.narrative-divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);}
+.narrative-divider-label{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+
 footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--muted);font-size:12px;}
 </style>
 </head>
@@ -119,6 +148,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
     <a href="#intro" class="active">Overview</a>
     <a href="#map-section">Map</a>
     <a href="#stats-section">Statistics</a>
+    <a href="#narratives">Narratives</a>
     
     <a href="#methods">Methods</a>
     <a href="#download">Data</a><a href="#team">Team</a>
@@ -244,6 +274,79 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
     </div>
   </div>
 </section>
+
+<!-- EXAMPLE NARRATIVES -->
+<section id="narratives" style="max-width:1300px">
+  <div class="section-label">Research Stories</div>
+  <h2>Example Narratives</h2>
+  <p class="section-sub">How this data — and its predecessor, state-level unemployment risk — has been used to answer real labor market questions.</p>
+
+  <!-- STATE-LEVEL BLOCK -->
+  <div class="narrative-block">
+    <div class="narrative-block-header">
+      <div class="narrative-block-tag tag-state">State-Level</div>
+      <h3 class="narrative-block-title">Built on State-Level Unemployment Risk</h3>
+      <p class="narrative-block-sub">These findings come from prior peer-reviewed and in-review work using state-level data — the foundation this county-level dataset extends.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="case-img-wrap">
+        <img src="images/case1_llm_exposure.png" alt="LLM exposure and unemployment risk over time" class="case-img">
+      </div>
+      <div class="case-text">
+        <div class="case-num">Case 01</div>
+        <p>Public debate links worsening job prospects for AI-exposed occupations to the release of ChatGPT in late 2022. Using monthly U.S. unemployment insurance records, we measure occupation- and location-specific unemployment risk and find that risk rose in AI-exposed occupations beginning in early 2022, months before ChatGPT.</p>
+      </div>
+    </div>
+
+    <div class="case-card reverse">
+      <div class="case-img-wrap">
+        <img src="images/case2_covid_maps.png" alt="COVID unemployment maps comparison" class="case-img">
+      </div>
+      <div class="case-text">
+        <div class="case-num">Case 02</div>
+        <p>In March 2020, during the rise of the 2020 US COVID Recession, states with the highest total unemployment rates (left panel) were not the same states where Healthcare Support occupations experienced the highest unemployment risk (right panel).</p>
+      </div>
+    </div>
+
+    <div class="case-card">
+      <div class="case-img-wrap">
+        <img src="images/case3_state_pairs.png" alt="Occupation-state pair correlation examples" class="case-img">
+      </div>
+      <div class="case-text">
+        <div class="case-num">Case 03</div>
+        <p>Many occupation–state pairs deviate from this aggregate result. For example, unemployment risk for Computer and Math occupations in Nebraska is positively correlated with employment share over time (left panel) and uncorrelated for Management occupations in New Hampshire (right panel). Thus, an occupation's employment share is not a reliable proxy for its unemployment risk.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="narrative-divider">
+    <span class="narrative-divider-line"></span>
+    <span class="narrative-divider-label">From State to County</span>
+    <span class="narrative-divider-line"></span>
+  </div>
+
+  <!-- COUNTY-LEVEL BLOCK -->
+  <div class="narrative-block">
+    <div class="narrative-block-header">
+      <div class="narrative-block-tag tag-county">County-Level</div>
+      <h3 class="narrative-block-title">New Stories at County Resolution</h3>
+      <p class="narrative-block-sub">What becomes visible when we move from state-level aggregates to county-level detail.</p>
+    </div>
+
+    <div class="case-card-placeholder">
+      <div class="case-num">Case 04</div>
+      <p style="color:var(--muted)">Coming soon — Energy workers in Pennsylvania</p>
+    </div>
+
+    <div class="case-card-placeholder">
+      <div class="case-num">Case 05</div>
+      <p style="color:var(--muted)">Coming soon — Economic resilience case study</p>
+    </div>
+  </div>
+</section>
+
 
 <!-- METHODS -->
 <section id="methods">
