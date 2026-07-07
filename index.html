@@ -127,6 +127,11 @@ h2{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;letter-spacing:-.025em;mar
 .case-num{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}
 .case-text p{font-size:14px;color:var(--text);line-height:1.75;}
 .case-card-placeholder{background:var(--surface2);border:1px dashed var(--border);border-radius:14px;padding:2rem;margin-bottom:1.5rem;}
+
+.stats-charts-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:1.5rem;margin-top:2rem;}
+@media(max-width:860px){.stats-charts-grid{grid-template-columns:1fr;}}
+.chart-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;}
+.chart-panel-title{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
 footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--muted);font-size:12px;}
 </style>
 </head>
@@ -136,6 +141,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
   <div class="nav-links">
     <a href="#intro" class="active">Overview</a>
     <a href="#map-section">Map</a>
+    <a href="#stats-section">Statistics</a>
     <a href="#narratives">Narratives</a>
     <a href="#methods">Methods</a>
     <a href="#download">Data</a><a href="#team">Team</a>
@@ -232,6 +238,91 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
   </div>
 </section>
 
+<section id="stats-section">
+  <div class="section-label">Data Insights</div>
+  <h2>Summary Statistics</h2>
+  <p class="section-sub">Aggregate unemployment risk patterns across sectors and time, 2017–2024 (continued claims, observed states).</p>
+  <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:1.5rem;margin-top:2rem;" class="stats-charts-grid">
+    <div class="chart-panel">
+      <div class="chart-panel-title">Avg Risk by Sector</div>
+      <svg id="sector-chart" viewBox="0 0 420 340" style="width:100%;height:auto;display:block;"></svg>
+    </div>
+    <div class="chart-panel">
+      <div class="chart-panel-title">Avg Risk Over Time</div>
+      <svg id="time-series-chart" viewBox="0 0 560 280" style="width:100%;height:auto;display:block;"></svg>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  // ── Chart 1: Horizontal bar — Avg Risk by Sector ──────────
+  const c1data = [{"sector": "21", "name": "Mining", "risk": 0.1611}, {"sector": "56", "name": "Administrative", "risk": 0.1504}, {"sector": "54", "name": "Professional Svcs", "risk": 0.1471}, {"sector": "23", "name": "Construction", "risk": 0.1405}, {"sector": "71", "name": "Arts", "risk": 0.14}, {"sector": "11", "name": "Agriculture", "risk": 0.1138}, {"sector": "53", "name": "Real Estate", "risk": 0.098}, {"sector": "51", "name": "Information", "risk": 0.0949}, {"sector": "72", "name": "Accommodation", "risk": 0.088}, {"sector": "81", "name": "Other Services", "risk": 0.0862}, {"sector": "62", "name": "Health Care", "risk": 0.0814}, {"sector": "42", "name": "Wholesale", "risk": 0.0794}, {"sector": "61", "name": "Education", "risk": 0.0674}, {"sector": "52", "name": "Finance", "risk": 0.0577}, {"sector": "92", "name": "Public Admin", "risk": 0.0403}, {"sector": "22", "name": "Utilities", "risk": 0.0359}];
+  const svg1 = d3.select('#sector-chart');
+  const W1=420, H1=340, ml=110, mr=20, mt=20, mb=20;
+  const x1 = d3.scaleLinear().domain([0, d3.max(c1data,d=>d.risk)*1.1]).range([ml,W1-mr]);
+  const y1 = d3.scaleBand().domain(c1data.map(d=>d.name)).range([mt,H1-mb]).padding(0.28);
+  const color1 = d=>d3.interpolateRgbBasis(['#1a6b9a','#27ae60','#f39c12','#e74c3c'])(d.risk/0.17);
+
+  svg1.append('g').selectAll('rect').data(c1data).join('rect')
+    .attr('x',ml).attr('y',d=>y1(d.name))
+    .attr('width',d=>x1(d.risk)-ml).attr('height',y1.bandwidth())
+    .attr('fill',color1).attr('rx',2);
+
+  svg1.append('g').selectAll('text.val').data(c1data).join('text')
+    .attr('x',d=>x1(d.risk)+4).attr('y',d=>y1(d.name)+y1.bandwidth()/2+4)
+    .text(d=>(d.risk*100).toFixed(1)+'%')
+    .attr('fill','#8b949e').attr('font-size','10px');
+
+  svg1.append('g').selectAll('text.label').data(c1data).join('text')
+    .attr('x',ml-6).attr('y',d=>y1(d.name)+y1.bandwidth()/2+4)
+    .text(d=>d.name).attr('text-anchor','end')
+    .attr('fill','#e6edf3').attr('font-size','10.5px');
+
+  svg1.append('line').attr('x1',ml).attr('x2',ml).attr('y1',mt).attr('y2',H1-mb)
+    .attr('stroke','#30363d').attr('stroke-width',1);
+
+  // ── Chart 2: Line — Avg Risk Over Time ───────────────────
+  const c2data = [{"date": "2017-01", "risk": 0.0641}, {"date": "2017-02", "risk": 0.0615}, {"date": "2017-03", "risk": 0.0595}, {"date": "2017-04", "risk": 0.0428}, {"date": "2017-05", "risk": 0.0385}, {"date": "2017-06", "risk": 0.0351}, {"date": "2017-07", "risk": 0.0342}, {"date": "2017-08", "risk": 0.0324}, {"date": "2017-09", "risk": 0.0296}, {"date": "2017-10", "risk": 0.0291}, {"date": "2017-11", "risk": 0.0326}, {"date": "2017-12", "risk": 0.039}, {"date": "2018-01", "risk": 0.0531}, {"date": "2018-02", "risk": 0.0517}, {"date": "2018-03", "risk": 0.0495}, {"date": "2018-04", "risk": 0.0399}, {"date": "2018-05", "risk": 0.0348}, {"date": "2018-06", "risk": 0.0311}, {"date": "2018-07", "risk": 0.0296}, {"date": "2018-08", "risk": 0.0274}, {"date": "2018-09", "risk": 0.0257}, {"date": "2018-10", "risk": 0.0231}, {"date": "2018-11", "risk": 0.0267}, {"date": "2018-12", "risk": 0.0326}, {"date": "2019-01", "risk": 0.0412}, {"date": "2019-02", "risk": 0.0387}, {"date": "2019-03", "risk": 0.0364}, {"date": "2019-04", "risk": 0.0294}, {"date": "2019-05", "risk": 0.0259}, {"date": "2019-06", "risk": 0.0261}, {"date": "2019-07", "risk": 0.0241}, {"date": "2019-08", "risk": 0.0214}, {"date": "2019-09", "risk": 0.0203}, {"date": "2019-10", "risk": 0.0208}, {"date": "2019-11", "risk": 0.0236}, {"date": "2019-12", "risk": 0.0278}, {"date": "2020-01", "risk": 0.0563}, {"date": "2020-02", "risk": 0.0564}, {"date": "2020-03", "risk": 0.0664}, {"date": "2020-04", "risk": 0.1913}, {"date": "2020-05", "risk": 0.2039}, {"date": "2020-06", "risk": 0.1821}, {"date": "2020-07", "risk": 0.1788}, {"date": "2020-08", "risk": 0.1664}, {"date": "2020-09", "risk": 0.146}, {"date": "2020-10", "risk": 0.1095}, {"date": "2020-11", "risk": 0.0923}, {"date": "2020-12", "risk": 0.0918}, {"date": "2021-01", "risk": 0.094}, {"date": "2021-02", "risk": 0.089}, {"date": "2021-03", "risk": 0.0821}, {"date": "2021-04", "risk": 0.0665}, {"date": "2021-05", "risk": 0.0593}, {"date": "2021-06", "risk": 0.0539}, {"date": "2021-07", "risk": 0.046}, {"date": "2021-08", "risk": 0.0331}, {"date": "2021-09", "risk": 0.0332}, {"date": "2021-10", "risk": 0.0272}, {"date": "2021-11", "risk": 0.0255}, {"date": "2021-12", "risk": 0.0274}, {"date": "2022-01", "risk": 0.0405}, {"date": "2022-02", "risk": 0.0393}, {"date": "2022-03", "risk": 0.0363}, {"date": "2022-04", "risk": 0.0249}, {"date": "2022-05", "risk": 0.0195}, {"date": "2022-06", "risk": 0.0186}, {"date": "2022-07", "risk": 0.018}, {"date": "2022-08", "risk": 0.0173}, {"date": "2022-09", "risk": 0.0152}, {"date": "2022-10", "risk": 0.0158}, {"date": "2022-11", "risk": 0.0188}, {"date": "2022-12", "risk": 0.0279}, {"date": "2023-01", "risk": 0.0325}, {"date": "2023-02", "risk": 0.0329}, {"date": "2023-03", "risk": 0.0316}, {"date": "2023-04", "risk": 0.0271}, {"date": "2023-05", "risk": 0.0227}, {"date": "2023-06", "risk": 0.023}, {"date": "2023-07", "risk": 0.0225}, {"date": "2023-08", "risk": 0.0216}, {"date": "2023-09", "risk": 0.021}, {"date": "2023-10", "risk": 0.0196}, {"date": "2023-11", "risk": 0.0219}, {"date": "2023-12", "risk": 0.028}, {"date": "2024-01", "risk": 0.0342}, {"date": "2024-02", "risk": 0.0257}, {"date": "2024-03", "risk": 0.024}, {"date": "2024-04", "risk": 0.0194}, {"date": "2024-05", "risk": 0.0157}, {"date": "2024-06", "risk": 0.0163}, {"date": "2024-07", "risk": 0.0159}, {"date": "2024-08", "risk": 0.0151}, {"date": "2024-09", "risk": 0.0145}, {"date": "2024-10", "risk": 0.0156}, {"date": "2024-11", "risk": 0.0177}, {"date": "2024-12", "risk": 0.0231}];
+  const svg2 = d3.select('#time-series-chart');
+  const W2=560, H2=280, ml2=44, mr2=16, mt2=16, mb2=36;
+
+  const x2 = d3.scalePoint().domain(c2data.map(d=>d.date)).range([ml2,W2-mr2]);
+  const y2 = d3.scaleLinear().domain([0, d3.max(c2data,d=>d.risk)*1.08]).range([H2-mb2,mt2]);
+  const line2 = d3.line().x(d=>x2(d.date)).y(d=>y2(d.risk)).curve(d3.curveMonotoneX);
+
+  // COVID annotation
+  svg2.append('line')
+    .attr('x1',x2('2020-04')).attr('x2',x2('2020-04'))
+    .attr('y1',mt2).attr('y2',H2-mb2)
+    .attr('stroke','#e74c3c').attr('stroke-width',1).attr('stroke-dasharray','4,3').attr('opacity',0.6);
+  svg2.append('text')
+    .attr('x',x2('2020-04')+4).attr('y',mt2+12)
+    .text('COVID-19').attr('fill','#e74c3c').attr('font-size','9px');
+
+  // Area fill
+  const area2 = d3.area().x(d=>x2(d.date)).y0(H2-mb2).y1(d=>y2(d.risk)).curve(d3.curveMonotoneX);
+  svg2.append('path').datum(c2data).attr('d',area2)
+    .attr('fill','#58a6ff').attr('opacity',0.08);
+
+  svg2.append('path').datum(c2data).attr('d',line2)
+    .attr('fill','none').attr('stroke','#58a6ff').attr('stroke-width',2);
+
+  // X axis — year ticks only
+  const yearTicks = c2data.filter(d=>d.date.endsWith('-01'));
+  svg2.append('g').selectAll('text').data(yearTicks).join('text')
+    .attr('x',d=>x2(d.date)).attr('y',H2-mb2+14)
+    .text(d=>d.date.slice(0,4)).attr('text-anchor','middle')
+    .attr('fill','#8b949e').attr('font-size','10px');
+
+  // Y axis ticks
+  svg2.append('g').attr('transform',`translate(${ml2},0)`)
+    .call(d3.axisLeft(y2).ticks(4).tickFormat(d=>(d*100).toFixed(0)+'%'))
+    .call(g=>g.select('.domain').remove())
+    .call(g=>g.selectAll('line').attr('x2',W2-ml2-mr2).attr('stroke','#30363d').attr('stroke-dasharray','2,3'))
+    .call(g=>g.selectAll('text').attr('fill','#8b949e').attr('font-size','10px'));
+})();
+</script>
+
 <section id="narratives" style="max-width:1300px">
   <div class="section-label">Research Stories</div>
   <h2>Example Narratives</h2>
@@ -254,7 +345,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
             arXiv:2601.02554
           </a>
         </div>
-        <p>Public debate links worsening job prospects for AI-exposed occupations to the release of ChatGPT in late 2022. Using monthly U.S. unemployment insurance records, we measure occupation- and location-specific unemployment risk and find that risk rose in AI-exposed occupations beginning in early 2022, months before ChatGPT.</p>
+        <p>Public debate links worsening job prospects for AI-exposed occupations to the release of ChatGPT in late 2022. Using monthly U.S. unemployment insurance records, we measure occupation- and location-specific unemployment risk and find that <strong>risk rose in AI-exposed occupations beginning in early 2022 — months before ChatGPT's release</strong>. Analyzing millions of LinkedIn profiles, we show that graduate cohorts from 2021 onward entered AI-exposed jobs at lower rates than earlier cohorts, with gaps opening before late 2022. From millions of university syllabi, we also find that graduates taking more AI-exposed curricula had higher first-job pay and shorter job searches after ChatGPT — suggesting the technology reshapes, rather than simply destroys, labor market opportunities.</p>
       </div>
     </div>
 
@@ -270,7 +361,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
             PNAS Nexus 2025
           </a>
         </div>
-        <p>In March 2020, during the rise of the 2020 US COVID Recession, states with the highest total unemployment rates (left panel) were not the same states where Healthcare Support occupations experienced the highest unemployment risk (right panel).</p>
+        <p>Standard employment statistics — such as total state unemployment rates — are inadequate proxies for understanding which workers face the greatest risk. In March 2020, during the rise of the 2020 US COVID Recession, <strong>states with the highest total unemployment rates were not the same states where Healthcare Support occupations experienced the highest unemployment risk</strong> (right panel). This divergence reveals that aggregate statistics mask critical variation across occupations and geographies that our occupation-level measure can capture.</p>
       </div>
     </div>
 
@@ -286,7 +377,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
             PNAS Nexus 2025
           </a>
         </div>
-        <p>Many occupation-state pairs deviate from this aggregate result. For example, unemployment risk for Computer and Math occupations in Nebraska is positively correlated with employment share over time (left panel) and uncorrelated for Management occupations in New Hampshire (right panel). Thus, an occupation's employment share is not a reliable proxy for its unemployment risk.</p>
+        <p>A key finding of our work is that <strong>an occupation's employment share is not a reliable proxy for its unemployment risk</strong>. Many occupation–state pairs deviate from aggregate trends in ways that are invisible to standard labor market statistics. For example, unemployment risk for Computer and Math occupations in Nebraska is positively correlated with employment share over time, while Management occupations in New Hampshire show no such correlation. These heterogeneous patterns motivate fine-grained, occupation-level measures of labor market distress — the foundation this county-level dataset extends.</p>
       </div>
     </div>
   </div>
