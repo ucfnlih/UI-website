@@ -396,7 +396,7 @@ const STATE_NAMES = {'01':'Alabama','02':'Alaska','04':'Arizona','05':'Arkansas'
 
 const STATE_ABBREV = {'01':'AL','02':'AK','04':'AZ','05':'AR','06':'CA','08':'CO','09':'CT','10':'DE','11':'DC','12':'FL','13':'GA','15':'HI','16':'ID','17':'IL','18':'IN','19':'IA','20':'KS','21':'KY','22':'LA','23':'ME','24':'MD','25':'MA','26':'MI','27':'MN','28':'MS','29':'MO','30':'MT','31':'NE','32':'NV','33':'NH','34':'NJ','35':'NM','36':'NY','37':'NC','38':'ND','39':'OH','40':'OK','41':'OR','42':'PA','44':'RI','45':'SC','46':'SD','47':'TN','48':'TX','49':'UT','50':'VT','51':'VA','53':'WA','54':'WV','55':'WI','56':'WY'};
 
-let dataByKey = {}, confByKey = {}, topoData = null;
+let dataByKey = {}, topoData = null;
 let currentIdx = 0, currentSector = 'ALL', currentClaimType = 'continued', playInterval = null, isPlaying = false;
 
 const riskScale = d3.scaleSequential().domain([0,0.25]).interpolator(t=>d3.interpolateRgbBasis(['#0d3b6e','#1a6b9a','#27ae60','#f39c12','#e74c3c'])(t));
@@ -469,24 +469,6 @@ function update(){
   drawMap('side-map',counties,statesLine,path,date,currentSector,'reliability',currentClaimType);
 }
 
-function renderConfPanel(){
-  const sector = document.getElementById('conf-sector-select').value;
-  const grid = document.getElementById('conf-grid');
-  const states = Object.keys(STATE_ABBREV).sort((a,b)=>STATE_ABBREV[a].localeCompare(STATE_ABBREV[b]));
-
-  const cells = [];
-  states.forEach(fips=>{
-    const abbr = STATE_ABBREV[fips];
-    let vals = [];
-    if(sector==='ALL'){
-      Object.keys(NAICS_NAMES).forEach(n=>{
-        const c = confByKey[currentClaimType+'_'+abbr+'_'+n];
-        if(c && c.conf!==null) vals.push(c.conf);
-      });
-    } else {
-      const c = confByKey[currentClaimType+'_'+abbr+'_'+sector];
-      if(c && c.conf!==null) vals.push(c.conf);
-    }
     if(vals.length===0) return;
     const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
     cells.push({abbr, avg});
@@ -500,127 +482,6 @@ function renderConfPanel(){
       '<div class="cc-state" style="color:'+color+'">'+c.abbr+'</div>'+
       '<div class="cc-val">'+c.avg.toFixed(2)+'</div></div>';
   }).join('');
-}
-
-function buildStats(){
-  const allVals=Object.values(dataByKey).filter(r=>r.claimType===currentClaimType);
-  const date='2021-06';
-
-  const risks=allVals.map(r=>r.risk).filter(x=>x>0);
-  document.getElementById('bs-avg').textContent=(risks.reduce((a,b)=>a+b,0)/risks.length*100).toFixed(1)+'%';
-  document.getElementById('bs-max').textContent=(Math.max(...risks)*100).toFixed(1)+'%';
-  const geoids=new Set(allVals.map(r=>r.geoid));
-  const predSet=new Set(allVals.filter(r=>r.pred).map(r=>r.geoid));
-  document.getElementById('bs-obs').textContent=(geoids.size-predSet.size).toLocaleString();
-  document.getElementById('bs-imp').textContent=predSet.size.toLocaleString();
-
-  const stateRisk={};
-  allVals.filter(r=>r.date===date).forEach(r=>{
-    const s=r.geoid.substring(0,2);
-    if(!stateRisk[s]) stateRisk[s]={sum:0,n:0};
-    stateRisk[s].sum+=r.risk; stateRisk[s].n++;
-  });
-  const stateAvg=Object.entries(stateRisk).map(([s,v])=>({state:s,avg:v.sum/v.n})).sort((a,b)=>b.avg-a.avg);
-  const maxRisk=stateAvg[0]?stateAvg[0].avg:0.1;
-
-  function renderRank(el, items, colorFn){
-    el.innerHTML=items.map((d,i)=>
-      '<div class="rank-row">'+
-      '<span class="rank-num">'+(i+1)+'</span>'+
-      '<span class="rank-name">'+(STATE_NAMES[d.state]||d.state)+'</span>'+
-      '<div class="rank-bar-wrap"><div class="rank-bar" style="width:'+(d.avg/maxRisk*100)+'%;background:'+colorFn(d.avg)+'"></div></div>'+
-      '<span class="rank-val">'+(d.avg*100).toFixed(1)+'%</span></div>'
-    ).join('');
-  }
-  renderRank(document.getElementById('state-rank-high'),stateAvg.slice(0,10),v=>d3.interpolateRgbBasis(['#27ae60','#f39c12','#e74c3c'])(v/maxRisk));
-  renderRank(document.getElementById('state-rank-low'),stateAvg.slice(-10).reverse(),()=>'#3fb950');
-
-  const secRisk={};
-  allVals.filter(r=>r.date===date&&r.sector!=='ALL').forEach(r=>{
-    if(!secRisk[r.sector]) secRisk[r.sector]={sum:0,n:0};
-    secRisk[r.sector].sum+=r.risk; secRisk[r.sector].n++;
-  });
-  const secAvg=Object.entries(secRisk).map(([s,v])=>({sector:s,avg:v.sum/v.n})).sort((a,b)=>b.avg-a.avg);
-  const maxSec=secAvg[0]?secAvg[0].avg:0.1;
-  document.getElementById('sector-rank').innerHTML=secAvg.map((d,i)=>
-    '<div class="rank-row">'+
-    '<span class="rank-num">'+(i+1)+'</span>'+
-    '<span class="rank-name">'+d.sector+' '+(NAICS_NAMES[d.sector]||'')+'</span>'+
-    '<div class="rank-bar-wrap"><div class="rank-bar" style="width:'+(d.avg/maxSec*100)+'%;background:var(--accent)"></div></div>'+
-    '<span class="rank-val">'+(d.avg*100).toFixed(1)+'%</span></div>'
-  ).join('');
-
-  drawTimeChart();
-  drawConfHistogram();
-}
-
-function drawTimeChart(){
-  const svg = d3.select('#time-chart');
-  svg.selectAll('*').remove();
-  const W=900,H=280,M={top:20,right:30,bottom:40,left:50};
-
-  function seriesFor(ct){
-    return MONTHS.map(date=>{
-      const vals = Object.values(dataByKey).filter(r=>r.claimType===ct && r.date===date).map(r=>r.risk);
-      return {date, avg: vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0};
-    });
-  }
-  const initialSeries = seriesFor('initial');
-  const contSeries = seriesFor('continued');
-
-  const x = d3.scalePoint().domain(MONTHS).range([M.left, W-M.right]);
-  const allValsArr = initialSeries.concat(contSeries).map(d=>d.avg);
-  const y = d3.scaleLinear().domain([0, Math.max(...allValsArr)*1.15]).range([H-M.bottom, M.top]);
-
-  const line = d3.line().x(d=>x(d.date)).y(d=>y(d.avg)).curve(d3.curveMonotoneX);
-
-  svg.append('g').attr('transform','translate(0,'+(H-M.bottom)+')')
-    .call(d3.axisBottom(x).tickFormat(d=>d.slice(5)))
-    .attr('color','#8b949e').attr('font-size','11px');
-  svg.append('g').attr('transform','translate('+M.left+',0)')
-    .call(d3.axisLeft(y).ticks(5).tickFormat(d=>(d*100).toFixed(0)+'%'))
-    .attr('color','#8b949e').attr('font-size','11px');
-
-  svg.selectAll('.tick line').attr('stroke','#30363d');
-  svg.selectAll('.domain').attr('stroke','#30363d');
-
-  svg.append('path').datum(contSeries).attr('d',line).attr('fill','none').attr('stroke','#58a6ff').attr('stroke-width',2.5);
-  contSeries.forEach(d=>svg.append('circle').attr('cx',x(d.date)).attr('cy',y(d.avg)).attr('r',3.5).attr('fill','#58a6ff'));
-  const legend = svg.append('g').attr('transform','translate('+(W-240)+','+M.top+')');
-  legend.append('circle').attr('cx',0).attr('cy',0).attr('r',4).attr('fill','#58a6ff');
-  legend.append('text').attr('x',10).attr('y',4).text('Continued Claims').attr('fill','#e6edf3').attr('font-size','12px');
-}
-
-function drawConfHistogram(){
-  const svg = d3.select('#conf-hist-chart');
-  svg.selectAll('*').remove();
-  const W=900,H=260,M={top:20,right:30,bottom:40,left:50};
-
-  const vals = Object.values(confByKey)
-    .filter(c=>c.claimType===currentClaimType && c.conf!==null)
-    .map(c=>c.conf);
-
-  const bins = d3.bin().domain([0,1]).thresholds(20)(vals);
-
-  const x = d3.scaleLinear().domain([0,1]).range([M.left,W-M.right]);
-  const y = d3.scaleLinear().domain([0, (d3.max(bins,d=>d.length)||1)*1.15]).range([H-M.bottom,M.top]);
-
-  svg.append('g').attr('transform','translate(0,'+(H-M.bottom)+')')
-    .call(d3.axisBottom(x).ticks(10).tickFormat(d3.format('.1f')))
-    .attr('color','#8b949e').attr('font-size','11px');
-  svg.append('g').attr('transform','translate('+M.left+',0)')
-    .call(d3.axisLeft(y).ticks(5))
-    .attr('color','#8b949e').attr('font-size','11px');
-  svg.selectAll('.tick line').attr('stroke','#30363d');
-  svg.selectAll('.domain').attr('stroke','#30363d');
-
-  svg.selectAll('rect').data(bins).join('rect')
-    .attr('x',d=>x(d.x0)+1)
-    .attr('y',d=>y(d.length))
-    .attr('width',d=>Math.max(0,x(d.x1)-x(d.x0)-2))
-    .attr('height',d=>H-M.bottom-y(d.length))
-    .attr('fill',d=>confColorScale((d.x0+d.x1)/2))
-    .attr('rx',2);
 }
 
 async function init(){
@@ -645,25 +506,13 @@ async function init(){
   ['map-loading','side-loading'].forEach(id=>document.getElementById(id).style.display='none');
   ['main-map','side-map'].forEach(id=>document.getElementById(id).style.display='block');
 
-  buildStats();
-  renderConfPanel();
   update();
 }
 
 document.getElementById('time-slider').addEventListener('input',function(){currentIdx=+this.value;update();});
 document.getElementById('sector-select').addEventListener('change',function(){currentSector=this.value;update();});
 document.getElementById('map-view-select').addEventListener('change',update);
-document.getElementById('conf-sector-select').addEventListener('change',renderConfPanel);
 
-document.querySelectorAll('#claim-toggle button').forEach(btn=>{
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('#claim-toggle button').forEach(b=>b.classList.remove('active'));
-    this.classList.add('active');
-    currentClaimType=this.dataset.type;
-    update();
-    buildStats();
-    renderConfPanel();
-  });
 });
 
 document.getElementById('play-btn').addEventListener('click',function(){
