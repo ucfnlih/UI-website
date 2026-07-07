@@ -469,21 +469,6 @@ function update(){
   drawMap('side-map',counties,statesLine,path,date,currentSector,'reliability',currentClaimType);
 }
 
-    if(vals.length===0) return;
-    const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-    cells.push({abbr, avg});
-  });
-
-  cells.sort((a,b)=>b.avg-a.avg);
-
-  grid.innerHTML = cells.map(c=>{
-    const color = confColorScale(c.avg);
-    return '<div class="conf-cell" style="background:'+color+'1a;border:1px solid '+color+'">'+
-      '<div class="cc-state" style="color:'+color+'">'+c.abbr+'</div>'+
-      '<div class="cc-val">'+c.avg.toFixed(2)+'</div></div>';
-  }).join('');
-}
-
 async function init(){
   const results = await Promise.all([
     fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json'),
@@ -512,8 +497,6 @@ async function init(){
 document.getElementById('time-slider').addEventListener('input',function(){currentIdx=+this.value;update();});
 document.getElementById('sector-select').addEventListener('change',function(){currentSector=this.value;update();});
 document.getElementById('map-view-select').addEventListener('change',update);
-
-});
 
 document.getElementById('play-btn').addEventListener('click',function(){
   if(isPlaying){clearInterval(playInterval);isPlaying=false;this.textContent='Play';}
