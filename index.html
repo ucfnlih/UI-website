@@ -136,7 +136,6 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
   <div class="nav-links">
     <a href="#intro" class="active">Overview</a>
     <a href="#map-section">Map</a>
-    <a href="#stats-section">Statistics</a>
     <a href="#narratives">Narratives</a>
     <a href="#methods">Methods</a>
     <a href="#download">Data</a><a href="#team">Team</a>
@@ -160,10 +159,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
   <div class="section-label">Interactive Explorer</div>
   <div class="map-header">
     <div><div class="map-title">County Unemployment Risk Map</div><div class="map-subtitle">Click any county to see details in the panel</div></div>
-    <div class="claim-toggle" id="claim-toggle">
-      <button data-type="initial">Initial Claims</button>
-      <button data-type="continued" class="active">Continued Claims</button>
-    </div>
+    <div style="font-size:13px;color:var(--muted);padding:4px 0;">Continued Claims</div>
   </div>
   <div class="controls-row">
     <span class="ctrl-label">SECTOR</span>
@@ -202,8 +198,8 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
       <span class="time-current" id="time-display">2021-01</span>
       <button class="play-btn" id="play-btn">Play</button>
     </div>
-    <input type="range" id="time-slider" min="0" max="5" value="0" step="1">
-    <div class="time-labels"><span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span></div>
+    <input type="range" id="time-slider" min="0" max="95" value="0" step="1">
+    <div class="time-labels"><span>2017</span><span>2018</span><span>2019</span><span>2020</span><span>2021</span><span>2022</span><span>2023</span><span>2024</span></div>
   </div>
 
   <div class="map-layout">
@@ -234,79 +230,6 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
       </div>
     </div>
   </div>
-
-  <div class="conf-panel">
-    <div class="map-card-title" style="margin-bottom:4px">Confidence Score by State &amp; Sector</div>
-    <div class="map-subtitle" style="margin-bottom:14px">Shown only for imputed states - observed states have ground truth and need no confidence score.</div>
-    <div class="conf-panel-controls">
-      <span class="ctrl-label">SECTOR</span>
-      <select id="conf-sector-select">
-        <option value="ALL">All Sectors (avg)</option>
-        <option value="11">11 - Agriculture</option>
-        <option value="21">21 - Mining</option>
-        <option value="22">22 - Utilities</option>
-        <option value="23">23 - Construction</option>
-        <option value="31">31 - Manufacturing</option>
-        <option value="42">42 - Wholesale Trade</option>
-        <option value="44">44 - Retail Trade</option>
-        <option value="48">48 - Transportation</option>
-        <option value="51">51 - Information</option>
-        <option value="52">52 - Finance &amp; Insurance</option>
-        <option value="53">53 - Real Estate</option>
-        <option value="54">54 - Professional Services</option>
-        <option value="56">56 - Administrative</option>
-        <option value="61">61 - Education</option>
-        <option value="62">62 - Health Care</option>
-        <option value="71">71 - Arts &amp; Entertainment</option>
-        <option value="72">72 - Accommodation &amp; Food</option>
-        <option value="81">81 - Other Services</option>
-        <option value="92">92 - Public Administration</option>
-      </select>
-    </div>
-    <div class="conf-grid" id="conf-grid"></div>
-    <div class="conf-legend">
-      <span>Low confidence</span>
-      <div class="legend-bar" style="background:linear-gradient(to right,#7f1d1d,#b45309,#15803d)"></div>
-      <span>High confidence</span>
-    </div>
-  </div>
-</section>
-<section id="stats-section">
-  <div class="section-label">Data Insights</div>
-  <h2>Summary Statistics</h2>
-  <p class="section-sub">Aggregated patterns across states, sectors, and time for the 2021 dataset.</p>
-
-  <div class="big-stat-row" id="big-stats">
-    <div class="big-stat"><div class="big-stat-val" style="color:var(--accent)" id="bs-avg">-</div><div class="big-stat-lbl">Avg Risk (All)</div></div>
-    <div class="big-stat"><div class="big-stat-val" style="color:#e74c3c" id="bs-max">-</div><div class="big-stat-lbl">Peak Risk</div></div>
-    <div class="big-stat"><div class="big-stat-val" style="color:var(--accent2)" id="bs-obs">-</div><div class="big-stat-lbl">Observed Counties</div></div>
-    <div class="big-stat"><div class="big-stat-val" style="color:#f0883e" id="bs-imp">-</div><div class="big-stat-lbl">Imputed Counties</div></div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stats-card">
-      <h3>Top 10 States by Avg Unemployment Risk</h3>
-      <div id="state-rank-high"></div>
-    </div>
-    <div class="stats-card">
-      <h3>Lowest 10 States by Avg Unemployment Risk</h3>
-      <div id="state-rank-low"></div>
-    </div>
-    <div class="stats-card">
-      <h3>Risk by NAICS Sector</h3>
-      <div id="sector-rank"></div>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <h3>Unemployment Risk Over Time - Initial vs Continued</h3>
-    <svg id="time-chart" viewBox="0 0 900 280" style="width:100%;height:auto;"></svg>
-  </div>
-
-  <div class="chart-card">
-    <h3>Confidence Score Distribution (Imputed States)</h3>
-    <svg id="conf-hist-chart" viewBox="0 0 900 260" style="width:100%;height:auto;"></svg>
-  </div>
 </section>
 
 <section id="narratives" style="max-width:1300px">
@@ -325,6 +248,12 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
       </div>
       <div class="case-text">
         <div class="case-num" style="font-size:20px">Case 01</div>
+        <div style="margin-bottom:10px;">
+          <a href="https://arxiv.org/abs/2601.02554" target="_blank"
+             style="font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:2px 8px;font-weight:600;letter-spacing:.04em;">
+            arXiv:2601.02554
+          </a>
+        </div>
         <p>Public debate links worsening job prospects for AI-exposed occupations to the release of ChatGPT in late 2022. Using monthly U.S. unemployment insurance records, we measure occupation- and location-specific unemployment risk and find that risk rose in AI-exposed occupations beginning in early 2022, months before ChatGPT.</p>
       </div>
     </div>
@@ -335,6 +264,12 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
       </div>
       <div class="case-text">
         <div class="case-num" style="font-size:20px">Case 02</div>
+        <div style="margin-bottom:10px;">
+          <a href="https://doi.org/10.1093/pnasnexus/pgaf107" target="_blank"
+             style="font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:2px 8px;font-weight:600;letter-spacing:.04em;">
+            PNAS Nexus 2025
+          </a>
+        </div>
         <p>In March 2020, during the rise of the 2020 US COVID Recession, states with the highest total unemployment rates (left panel) were not the same states where Healthcare Support occupations experienced the highest unemployment risk (right panel).</p>
       </div>
     </div>
@@ -345,6 +280,12 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
       </div>
       <div class="case-text">
         <div class="case-num" style="font-size:20px">Case 03</div>
+        <div style="margin-bottom:10px;">
+          <a href="https://doi.org/10.1093/pnasnexus/pgaf107" target="_blank"
+             style="font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:2px 8px;font-weight:600;letter-spacing:.04em;">
+            PNAS Nexus 2025
+          </a>
+        </div>
         <p>Many occupation-state pairs deviate from this aggregate result. For example, unemployment risk for Computer and Math occupations in Nebraska is positively correlated with employment share over time (left panel) and uncorrelated for Management occupations in New Hampshire (right panel). Thus, an occupation's employment share is not a reliable proxy for its unemployment risk.</p>
       </div>
     </div>
@@ -408,12 +349,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
     <div class="dl-card">
       <h3>Full Dataset (CSV)</h3>
       <p>All counties, both claim types, all sectors. Includes unemployment risk, confidence scores, and source flags.</p>
-      <a class="dl-btn" href="fake_data.csv" download>Download CSV</a>
-    </div>
-    <div class="dl-card">
-      <h3>Confidence Scores (CSV)</h3>
-      <p>State x sector x claim-type confidence scores for imputed states only.</p>
-      <a class="dl-btn" href="confidence_score.csv" download>Download CSV</a>
+      <a class="dl-btn" href="website_data.csv" download>Download CSV</a>
     </div>
     <div class="dl-card">
       <h3>Replication Notebook</h3>
@@ -430,28 +366,29 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
   <div class="team-grid">
     <div class="team-card">
       <div class="team-avatar"><img src="images/team_pi.jpg" alt="PI" onerror="this.parentElement.textContent='PI'"></div>
-      <div class="team-name">Prof. [Name]</div>
+      <div class="team-name">Morgan R. Frank</div>
       <div class="team-role">Principal Investigator</div>
-      <div class="team-dept">Department of Economics<br>University of Pittsburgh</div>
+      <div class="team-dept">Assistant Professor<br>University of Pittsburgh</div>
     </div>
     <div class="team-card">
       <div class="team-avatar"><img src="images/team_ra1.jpg" alt="RA1" onerror="this.parentElement.textContent='RA'"></div>
-      <div class="team-name">[Researcher Name]</div>
+      <div class="team-name">Arezou Farzaneh</div>
       <div class="team-role">Graduate Researcher</div>
-      <div class="team-dept">Data pipeline, imputation model,<br>confidence scoring</div>
+      <div class="team-dept">PhD Student<br>University of Pittsburgh</div>
     </div>
     <div class="team-card">
       <div class="team-avatar"><img src="images/team_ra2.jpg" alt="RA2" onerror="this.parentElement.textContent='RA'"></div>
-      <div class="team-name">[Researcher Name]</div>
+      <div class="team-name">Wendi Li</div>
       <div class="team-role">Graduate Researcher</div>
-      <div class="team-dept">ACS feature engineering,<br>QCEW data integration</div>
+      <div class="team-dept">PhD Student<br>University of Pittsburgh</div>
     </div>
   </div>
 </section>
 
 <footer>Built with D3.js - Data: BLS QCEW, Census ACS, State UI Agencies - University of Pittsburgh</footer>
 <script>
-const MONTHS = ['2021-01','2021-03','2021-05','2021-07','2021-09','2021-11'];
+const MONTHS = [];
+for(let y=2017;y<=2024;y++) for(let m=1;m<=12;m++) MONTHS.push(y+'-'+(String(m).padStart(2,'0')));
 
 const NAICS_NAMES = {'11':'Agriculture','21':'Mining','22':'Utilities','23':'Construction','31':'Manufacturing','42':'Wholesale','44':'Retail','48':'Transportation','51':'Information','52':'Finance','53':'Real Estate','54':'Professional Svcs','56':'Administrative','61':'Education','62':'Health Care','71':'Arts','72':'Accommodation','81':'Other Services','92':'Public Admin'};
 
@@ -471,16 +408,22 @@ function reliabilityColor(v){
   return d3.interpolateRgb('#1e3a5f','#58a6ff')(v.conf||0.5);
 }
 
+
+// Normalise multi-range NAICS codes to match website dropdown values
+const SECTOR_NORM = {'31-33':'31','44-45':'44','48-49':'48'};
+function normSector(s){ return SECTOR_NORM[s]||s; }
+
+
 function getVal(geoid, date, sector, claimType){
   if(sector==='ALL'){
     let s=0,c=0,anyP=false,cs=0,cc=0;
     Object.keys(NAICS_NAMES).forEach(n=>{
-      const r=dataByKey[claimType+'_'+geoid+'_'+date+'_'+n];
+      const r=dataByKey[claimType+'_'+geoid+'_'+date+'_'+(SECTOR_NORM[n]||n)];
       if(r){s+=r.risk;c++;if(r.pred){anyP=true;if(r.conf){cs+=r.conf;cc++;}}}
     });
     return c>0?{risk:s/c,pred:anyP,conf:cc>0?cs/cc:null}:null;
   }
-  return dataByKey[claimType+'_'+geoid+'_'+date+'_'+sector]||null;
+  return dataByKey[claimType+'_'+geoid+'_'+date+'_'+(SECTOR_NORM[sector]||sector)]||null;
 }
 
 function drawMap(svgId, counties, statesLine, path, date, sector, mode, claimType){
@@ -561,7 +504,7 @@ function renderConfPanel(){
 
 function buildStats(){
   const allVals=Object.values(dataByKey).filter(r=>r.claimType===currentClaimType);
-  const date='2021-07';
+  const date='2021-06';
 
   const risks=allVals.map(r=>r.risk).filter(x=>x>0);
   document.getElementById('bs-avg').textContent=(risks.reduce((a,b)=>a+b,0)/risks.length*100).toFixed(1)+'%';
@@ -641,17 +584,11 @@ function drawTimeChart(){
   svg.selectAll('.tick line').attr('stroke','#30363d');
   svg.selectAll('.domain').attr('stroke','#30363d');
 
-  svg.append('path').datum(initialSeries).attr('d',line).attr('fill','none').attr('stroke','#a78bfa').attr('stroke-width',2.5);
   svg.append('path').datum(contSeries).attr('d',line).attr('fill','none').attr('stroke','#58a6ff').attr('stroke-width',2.5);
-
-  initialSeries.forEach(d=>svg.append('circle').attr('cx',x(d.date)).attr('cy',y(d.avg)).attr('r',3.5).attr('fill','#a78bfa'));
   contSeries.forEach(d=>svg.append('circle').attr('cx',x(d.date)).attr('cy',y(d.avg)).attr('r',3.5).attr('fill','#58a6ff'));
-
-  const legend = svg.append('g').attr('transform','translate('+(W-220)+','+M.top+')');
-  legend.append('circle').attr('cx',0).attr('cy',0).attr('r',4).attr('fill','#a78bfa');
-  legend.append('text').attr('x',10).attr('y',4).text('Initial Claims').attr('fill','#e6edf3').attr('font-size','12px');
-  legend.append('circle').attr('cx',0).attr('cy',18).attr('r',4).attr('fill','#58a6ff');
-  legend.append('text').attr('x',10).attr('y',22).text('Continued Claims').attr('fill','#e6edf3').attr('font-size','12px');
+  const legend = svg.append('g').attr('transform','translate('+(W-240)+','+M.top+')');
+  legend.append('circle').attr('cx',0).attr('cy',0).attr('r',4).attr('fill','#58a6ff');
+  legend.append('text').attr('x',10).attr('y',4).text('Continued Claims').attr('fill','#e6edf3').attr('font-size','12px');
 }
 
 function drawConfHistogram(){
@@ -689,8 +626,7 @@ function drawConfHistogram(){
 async function init(){
   const results = await Promise.all([
     fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json'),
-    fetch('fake_data.csv'),
-    fetch('confidence_score.csv')
+    fetch('website_data.csv')
   ]);
   topoData = await results[0].json();
 
@@ -700,18 +636,11 @@ async function init(){
     const parts = line.split(',');
     const geoid=parts[0],risk=parts[1],date=parts[2],sector=parts[3],conf=parts[4],pred=parts[5],claimType=parts[6];
     const ct=(claimType||'continued').trim();
-    const key=ct+'_'+geoid+'_'+date+'_'+sector;
+    const normSec=SECTOR_NORM[sector]||sector;
+    const key=ct+'_'+geoid+'_'+date+'_'+normSec;
     dataByKey[key]={geoid:geoid,risk:parseFloat(risk)||0,date:date,sector:sector,conf:conf?parseFloat(conf):null,pred:pred&&pred.trim()==='True',claimType:ct};
   });
 
-  const confText = await results[2].text();
-  const confLines = confText.trim().split('\n');
-  confLines.slice(1).forEach(line=>{
-    const parts = line.split(',');
-    const state=parts[0],sector=parts[1],claimType=parts[2],conf=parts[3],ifPredict=parts[4];
-    const key=claimType+'_'+state+'_'+sector;
-    confByKey[key]={state:state,sector:sector,claimType:claimType,conf:conf?parseFloat(conf):null,pred:ifPredict&&ifPredict.trim()==='True'};
-  });
 
   ['map-loading','side-loading'].forEach(id=>document.getElementById(id).style.display='none');
   ['main-map','side-map'].forEach(id=>document.getElementById(id).style.display='block');
