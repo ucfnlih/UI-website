@@ -440,7 +440,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
     <div class="dl-card">
       <h3>Full Dataset (CSV)</h3>
       <p>All counties, both claim types, all sectors. Includes unemployment risk, confidence scores, and source flags.</p>
-      <a class="dl-btn" href="website_data.csv" download>Download CSV</a>
+      <a class="dl-btn" href="https://drive.google.com/uc?export=download&id=1V1idr9vwKC3aXvc21HJoJd_7cyMKdqst" download>Download CSV</a>
     </div>
     <div class="dl-card">
       <h3>Replication Notebook</h3>
@@ -564,7 +564,7 @@ function update(){
 async function init(){
   const results = await Promise.all([
     fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json'),
-    fetch('website_data.csv')
+    fetch('https://media.githubusercontent.com/media/ucfnlih/UI-website/main/website_data.csv')
   ]);
   topoData = await results[0].json();
 
