@@ -183,6 +183,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
       <option value="52">52 - Finance &amp; Insurance</option>
       <option value="53">53 - Real Estate</option>
       <option value="54">54 - Professional Services</option>
+      <option value="55">55 - Management</option>
       <option value="56">56 - Administrative</option>
       <option value="61">61 - Education</option>
       <option value="62">62 - Health Care</option>
@@ -222,9 +223,13 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
         <div class="loading" id="side-loading"><div class="spinner"></div></div>
         <svg class="map-svg" id="side-map" viewBox="0 0 960 600" style="display:none"></svg>
         <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.9;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><div style="width:12px;height:12px;border-radius:2px;background:#3fb950"></div>Observed data</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><div style="width:12px;height:12px;border-radius:2px;background:#1e3a5f"></div>Low confidence (imputed)</div>
-          <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;border-radius:2px;background:#58a6ff"></div>High confidence (imputed)</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;"><div style="width:12px;height:12px;border-radius:2px;background:#3fb950"></div>Observed data</div>
+          <div style="margin-bottom:3px;">Imputed — confidence score:</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="white-space:nowrap">Low</span>
+            <div style="flex:1;height:8px;border-radius:4px;background:linear-gradient(to right,#7f1d1d,#b45309,#f59e0b,#15803d)"></div>
+            <span style="white-space:nowrap">High</span>
+          </div>
         </div>
       </div>
 
@@ -482,7 +487,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:v
 const MONTHS = [];
 for(let y=2017;y<=2024;y++) for(let m=1;m<=12;m++) MONTHS.push(y+'-'+(String(m).padStart(2,'0')));
 
-const NAICS_NAMES = {'11':'Agriculture','21':'Mining','22':'Utilities','23':'Construction','31':'Manufacturing','42':'Wholesale','44':'Retail','48':'Transportation','51':'Information','52':'Finance','53':'Real Estate','54':'Professional Svcs','56':'Administrative','61':'Education','62':'Health Care','71':'Arts','72':'Accommodation','81':'Other Services','92':'Public Admin'};
+const NAICS_NAMES = {'11':'Agriculture','21':'Mining','22':'Utilities','23':'Construction','31':'Manufacturing','42':'Wholesale','44':'Retail','48':'Transportation','51':'Information','52':'Finance','53':'Real Estate','54':'Professional Svcs','55':'Management','56':'Administrative','61':'Education','62':'Health Care','71':'Arts','72':'Accommodation','81':'Other Services','92':'Public Admin'};
 
 const STATE_NAMES = {'01':'Alabama','02':'Alaska','04':'Arizona','05':'Arkansas','06':'California','08':'Colorado','09':'Connecticut','10':'Delaware','11':'DC','12':'Florida','13':'Georgia','15':'Hawaii','16':'Idaho','17':'Illinois','18':'Indiana','19':'Iowa','20':'Kansas','21':'Kentucky','22':'Louisiana','23':'Maine','24':'Maryland','25':'Massachusetts','26':'Michigan','27':'Minnesota','28':'Mississippi','29':'Missouri','30':'Montana','31':'Nebraska','32':'Nevada','33':'New Hampshire','34':'New Jersey','35':'New Mexico','36':'New York','37':'North Carolina','38':'North Dakota','39':'Ohio','40':'Oklahoma','41':'Oregon','42':'Pennsylvania','44':'Rhode Island','45':'South Carolina','46':'South Dakota','47':'Tennessee','48':'Texas','49':'Utah','50':'Vermont','51':'Virginia','53':'Washington','54':'West Virginia','55':'Wisconsin','56':'Wyoming'};
 
@@ -496,8 +501,9 @@ const confColorScale = d3.scaleSequential().domain([0,1]).interpolator(d3.interp
 
 function reliabilityColor(v){
   if(!v) return '#1a1a1a';
-  if(!v.pred) return '#1a4a1a';
-  return d3.interpolateRgb('#1e3a5f','#58a6ff')(v.conf||0.5);
+  if(!v.pred) return '#3fb950';  // observed = solid green
+  const c = (v.conf!==null&&v.conf!==undefined) ? v.conf : 0.5;
+  return d3.interpolateRgbBasis(['#7f1d1d','#b45309','#f59e0b','#15803d'])(c);
 }
 
 
@@ -546,6 +552,9 @@ function drawMap(svgId, counties, statesLine, path, date, sector, mode, claimTyp
         '<div class="detail-row"><span class="detail-key">Source</span><span class="detail-val">'+(v.pred?'<span class="badge badge-pred">Imputed</span>':'<span class="badge badge-obs">Observed</span>')+'</span></div>';
     });
   svg.append('path').datum(statesLine).attr('d',path).attr('fill','none').attr('stroke','#58a6ff').attr('stroke-width',1.2).attr('opacity',0.7);
+  // Outer nation border
+  const nation=topojson.feature(topoData,topoData.objects.nation);
+  if(nation) svg.append('path').datum(nation).attr('d',path).attr('fill','none').attr('stroke','#e6edf3').attr('stroke-width',1.8).attr('opacity',0.9);
 }
 
 function update(){
