@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Energy transition labor risk in Colorado</title>
+<style>
+:root{
+  --paper:#f4f0e8;
+  --paper2:#fbf8f1;
+  --ink:#102338;
+  --muted:#6f786f;
+  --line:#d7d1c7;
+  --blue:#2f6bff;
+  --blue2:#87a8ff;
+  --orange:#e87545;
+  --green:#4d8b6a;
+  --yellow:#f3d36b;
+  --navy:#102338;
+  --white:#fffdf8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(47,107,255,.07), transparent 28%),
+    radial-gradient(circle at 95% 20%, rgba(232,117,69,.08), transparent 25%),
+    var(--paper);
+  color:var(--ink);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+a{color:inherit;text-decoration:none}
+.shell{max-width:1240px;margin:0 auto;padding:22px 28px 70px}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--ink);padding:4px 0 14px;margin-bottom:18px
+}
+.brand{font-weight:900;letter-spacing:-.035em;font-size:20px}
+.topnav{display:flex;gap:22px;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:#536170}
+.topnav span.active{color:var(--blue);font-weight:800}
+.issue{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#68747e}
+
+.hero{
+  display:grid;grid-template-columns:1.18fr .82fr;gap:34px;
+  padding:32px 0 38px;border-bottom:1px solid var(--line)
+}
+.hero-copy{padding-right:15px}
+.kicker{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.13em;color:var(--blue)
+}
+.kicker:before{content:"";width:28px;height:3px;background:var(--blue);display:block}
+h1{
+  font-size:58px;line-height:.98;letter-spacing:-.055em;margin:15px 0 18px;max-width:760px
+}
+.hero-dek{font-size:19px;line-height:1.58;color:#445363;max-width:780px;margin:0}
+.hero-side{
+  align-self:end;background:var(--ink);color:white;border-radius:26px 26px 7px 26px;
+  padding:28px 28px 25px;min-height:320px;position:relative;overflow:hidden
+}
+.hero-side:after{content:none}
+
+.hero-anim{
+  margin-top:22px;
+  border-top:1px solid rgba(255,255,255,.12);
+  padding-top:16px;
+}
+.hero-anim-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+.hero-anim-title{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:#b9c9da;
+  font-weight:800;
+}
+.hero-anim-status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  color:#dbe7f3;
+}
+.hero-anim-status:before{
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#7dd3fc;
+  box-shadow:0 0 0 0 rgba(125,211,252,.45);
+  animation:statusPulse 2.2s ease-out infinite;
+}
+.hero-mini{
+  width:100%;
+  height:auto;
+  display:block;
+  overflow:visible;
+}
+.hero-axis{
+  stroke:rgba(255,255,255,.24);
+  stroke-width:1;
+}
+.hero-grid{
+  stroke:rgba(255,255,255,.08);
+  stroke-width:1;
+}
+.hero-dot{
+  fill:#8fb6ff;
+  opacity:.7;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.hero-dot.mesa{
+  fill:#f3d36b;
+  opacity:1;
+  animation:mesaPulse 2.6s ease-in-out infinite;
+}
+.hero-dot.weld{animation:floatDot 4.8s ease-in-out infinite}
+.hero-dot.garfield{animation:floatDot2 5.4s ease-in-out infinite}
+.hero-dot.rio{animation:floatDot3 6.2s ease-in-out infinite}
+.hero-trail{
+  fill:none;
+  stroke:#f3d36b;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-dasharray:5 7;
+  opacity:.62;
+  animation:dashFlow 7s linear infinite;
+}
+.hero-mini-label{
+  fill:#c8d6e5;
+  font-size:8px;
+  font-family:Inter,ui-sans-serif,system-ui,sans-serif;
+}
+.hero-mini-note{
+  fill:#fff;
+  font-size:8.5px;
+  font-weight:800;
+  font-family:Inter,ui-sans-serif,system-ui,sans-serif;
+}
+@keyframes mesaPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.32)}
+}
+@keyframes floatDot{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(3px,-4px)}
+}
+@keyframes floatDot2{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(-3px,3px)}
+}
+@keyframes floatDot3{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(4px,2px)}
+}
+@keyframes dashFlow{
+  to{stroke-dashoffset:-120}
+}
+@keyframes statusPulse{
+  0%{box-shadow:0 0 0 0 rgba(125,211,252,.42)}
+  70%{box-shadow:0 0 0 8px rgba(125,211,252,0)}
+  100%{box-shadow:0 0 0 0 rgba(125,211,252,0)}
+}
+.side-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#b9c9da;font-weight:800}
+.big-number{font-size:72px;line-height:1;font-weight:900;letter-spacing:-.055em;margin-top:14px}
+.big-caption{font-size:16px;line-height:1.45;color:#d8e1ea;max-width:310px;margin-top:8px}
+.mini-rule{width:54px;height:2px;background:linear-gradient(90deg,#7dd3fc,#f3d36b);margin:22px 0 14px;border-radius:999px}
+.side-note{font-size:12px;color:#b5c3d0;line-height:1.5;max-width:300px}
+
+.newsband{
+  display:grid;grid-template-columns:160px 1fr 1fr 1fr;
+  border-bottom:1px solid var(--line);margin-bottom:44px
+}
+.news-label{
+  padding:20px 18px 20px 0;border-right:1px solid var(--line);
+  font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em
+}
+.news-label strong{display:block;font-size:24px;letter-spacing:-.04em;text-transform:none;margin-bottom:4px}
+.news-item{padding:18px 18px 19px;border-right:1px solid var(--line)}
+.news-item:last-child{border-right:none}
+.news-meta{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#7b807a;font-weight:800}
+.news-head{font-size:14px;line-height:1.35;font-weight:850;margin:7px 0}
+.news-dek{font-size:11.5px;line-height:1.45;color:#6a736f;margin:0 0 9px}
+.news-src{font-size:11px;color:var(--blue);font-weight:800}
+
+.section{margin:48px 0}
+.section-no{font-size:11px;color:var(--orange);font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+.section-head{
+  display:grid;grid-template-columns:.85fr 1.15fr;gap:34px;align-items:end;
+  border-top:1px solid var(--ink);padding-top:14px;margin-bottom:22px
+}
+.section-head h2{font-size:34px;line-height:1.06;letter-spacing:-.04em;margin:0}
+.section-head p{font-size:14px;line-height:1.6;color:#66717b;margin:0;max-width:620px}
+
+.story-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:20px}
+.editorial-card{
+  background:var(--white);border:1px solid #ded7cc;border-radius:24px;padding:26px;
+  box-shadow:0 12px 30px rgba(16,35,56,.04)
+}
+.pullquote{
+  background:var(--blue);color:#fff;border-radius:24px;padding:28px;
+  display:flex;flex-direction:column;justify-content:space-between
+}
+.pullquote .quote{font-size:28px;line-height:1.17;font-weight:850;letter-spacing:-.035em}
+.pullquote .qsmall{font-size:12px;color:#dce5ff;line-height:1.5;margin-top:24px}
+
+.metric-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:20px
+}
+.metric{background:var(--paper2);padding:18px 17px}
+.metric .num{font-size:30px;font-weight:900;letter-spacing:-.04em}
+.metric .lbl{font-size:11.5px;line-height:1.35;color:#68747b;margin-top:4px}
+
+.viz-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:20px}
+.viz-card{background:var(--white);border:1px solid #ded7cc;border-radius:24px;padding:24px}
+.viz-title{font-size:20px;font-weight:900;letter-spacing:-.025em;margin-bottom:4px}
+.viz-sub{font-size:12.5px;color:#6b757e;line-height:1.5;margin-bottom:12px}
+svg{width:100%;height:auto;display:block}
+.axis{stroke:#9da7af;stroke-width:1}
+.gridline{stroke:#e7e3db;stroke-width:1}
+.tick{font-size:10px;fill:#707a83}
+.label{font-size:11px;fill:#203448;font-weight:800}
+.small{font-size:9.5px;fill:#6f7881}
+.bubble{fill:#3f8fc5;fill-opacity:.88;stroke:#fff;stroke-width:1.4}
+
+.ranklist{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.rankrow{display:grid;grid-template-columns:28px 84px 1fr 52px;gap:8px;align-items:center}
+.ranknum{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:850}
+.rankname{font-size:12.5px;font-weight:850}
+.track{height:12px;background:#eae6de;border-radius:999px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue));border-radius:999px}
+.riskval{font-size:12.5px;font-weight:900;color:#174c91}
+
+.compare-card{background:var(--ink);color:#fff;border-radius:26px;padding:26px}
+.compare-card .viz-title{color:#fff}
+.compare-card .viz-sub{color:#b8c7d5}
+.compare-card .gridline{stroke:#2a4058}
+.compare-card .tick{fill:#b8c7d5}
+.compare-card .label{fill:#fff}
+.compare-card .small{fill:#aebdca}
+
+.table-card{background:var(--white);border:1px solid #ded7cc;border-radius:24px;padding:20px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#6a746f;
+  padding:10px 9px;border-bottom:1px solid #dcd6cc;white-space:nowrap
+}
+td{padding:12px 9px;border-bottom:1px solid #eee9e1;white-space:nowrap}
+tbody tr:hover{background:#f7f4ed}
+.riskhi{font-weight:900;color:#174d91}
+.badge{font-size:10px;padding:3px 6px;border-radius:999px;background:#eef3fb;color:#496781;font-weight:800}
+
+.insights{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.insight{
+  border-top:4px solid var(--orange);background:var(--paper2);padding:18px 18px 20px;border-radius:0 0 18px 18px
+}
+.insight:nth-child(2){border-color:var(--blue)}
+.insight:nth-child(3){border-color:var(--green)}
+.insight h3{font-size:15px;margin:0 0 7px}
+.insight p{font-size:12.5px;line-height:1.55;color:#646f76;margin:0}
+
+.method-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px}
+.formula{
+  background:#12263f;color:#f8fafc;border-radius:14px;padding:15px 16px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.5
+}
+.smallcopy{font-size:13px;line-height:1.65;color:#5f6c75}
+
+footer{
+  border-top:1px solid var(--ink);padding-top:18px;margin-top:56px;
+  font-size:11.5px;line-height:1.6;color:#6f787e
+}
+
+@media(max-width:940px){
+  .hero,.section-head,.story-grid,.viz-grid,.method-grid{grid-template-columns:1fr}
+  .newsband{grid-template-columns:1fr}
+  .news-label,.news-item{border-right:none;border-bottom:1px solid var(--line)}
+  .metric-strip,.insights{grid-template-columns:1fr 1fr}
+  h1{font-size:44px}
+}
+@media(max-width:620px){
+  .shell{padding:14px 16px 45px}
+  .topnav{display:none}
+  h1{font-size:37px}
+  .metric-strip,.insights{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="topbar">
+    <div class="brand">U.S. Unemployment Atlas</div>
+    <div class="topnav"><span>Explore</span><span>Industries</span><span class="active">Use cases</span><span>Methods</span></div>
+    <div class="issue">Data story 01</div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="kicker">Energy transition use case</div>
+      <h1>Energy employment exposure is not the same as unemployment risk.</h1>
+      <p class="hero-dek">
+        Colorado shows why industry exposure and current labor market stress need to be measured separately.
+        Some counties have a much larger or more specialized mining, quarrying, and oil and gas workforce, yet workers there can face lower estimated unemployment risk than workers in counties with less industry exposure.
+      </p>
+    </div>
+
+    <aside class="hero-side">
+      <div class="side-label">Highest estimated 2024 risk</div>
+      <div class="big-number">1.35%</div>
+      <div class="big-caption">Mesa County had the highest estimated unemployment risk among the selected counties in the illustrative comparison.</div>
+      <div class="mini-rule"></div>
+      <div class="side-note">The result comes from predicted continued UI claimants combined with local QCEW employment.</div>
+
+      <div class="hero-anim" aria-label="Animated mini scatterplot showing that employment specialization and unemployment risk do not move together">
+        <div class="hero-anim-head">
+          <div class="hero-anim-title">Exposure vs. risk</div>
+          <div class="hero-anim-status">live concept</div>
+        </div>
+
+        <svg class="hero-mini" viewBox="0 0 300 118" role="img" aria-label="Animated illustration of energy employment exposure versus unemployment risk">
+          <line class="hero-grid" x1="28" y1="26" x2="286" y2="26"></line>
+          <line class="hero-grid" x1="28" y1="58" x2="286" y2="58"></line>
+          <line class="hero-grid" x1="28" y1="90" x2="286" y2="90"></line>
+
+          <line class="hero-axis" x1="28" y1="98" x2="286" y2="98"></line>
+          <line class="hero-axis" x1="28" y1="16" x2="28" y2="98"></line>
+
+          <path class="hero-trail" d="M56 48 C92 34, 126 47, 164 58 S226 78, 272 76"></path>
+
+          <circle class="hero-dot mesa" cx="63" cy="34" r="6"></circle>
+          <circle class="hero-dot weld" cx="118" cy="58" r="7"></circle>
+          <circle class="hero-dot garfield" cx="92" cy="74" r="5.5"></circle>
+          <circle class="hero-dot rio" cx="267" cy="82" r="5"></circle>
+
+          <text class="hero-mini-note" x="72" y="31">Mesa</text>
+          <text class="hero-mini-label" x="249" y="93">Rio Blanco</text>
+
+          <text class="hero-mini-label" x="175" y="114">more employment specialization →</text>
+          <text class="hero-mini-label" x="7" y="20" transform="rotate(-90 7 20)">risk ↑</text>
+        </svg>
+      </div>
+    </aside>
+  </section>
+
+  <section class="newsband">
+    <div class="news-label"><strong>Context pulse</strong>Recent developments shaping Colorado's transition</div>
+    
+      <article class="news-item">
+        <div class="news-meta">Jun. 26, 2026 · Reuters</div>
+        <div class="news-head">U.S. orders Craig Station Unit 1 to remain available through the summer</div>
+        <p class="news-dek">A federal emergency order extended the availability of a Colorado coal unit that had been scheduled to retire, showing how transition timelines can shift after closure plans are announced.</p>
+        <a class="news-src" href="https://www.reuters.com/legal/litigation/us-issues-order-keep-colorado-coal-plant-available-through-summer-2026-06-26/" target="_blank" rel="noopener">Source ↗</a>
+      </article>
+    
+      <article class="news-item">
+        <div class="news-meta">Mar. 9, 2026 · Colorado General Assembly</div>
+        <div class="news-head">Colorado signs new hiring preference for coal transition workers</div>
+        <p class="news-dek">SB26-052 requires covered businesses in coal transition communities to make good faith efforts to give qualified transition workers a first and preferred opportunity for available jobs.</p>
+        <a class="news-src" href="https://leg.colorado.gov/bills/SB26-052" target="_blank" rel="noopener">Source ↗</a>
+      </article>
+    
+      <article class="news-item">
+        <div class="news-meta">Dec. 5, 2025 · Associated Press</div>
+        <div class="news-head">In Craig, families begin moving from coal work into new businesses and technologies</div>
+        <p class="news-dek">AP documented workers and families adapting as coal facilities wind down, including a family moving from mining into geothermal installation.</p>
+        <a class="news-src" href="https://apnews.com/article/e78eb827848973f5712a20da55133a94" target="_blank" rel="noopener">Source ↗</a>
+      </article>
+    
+  </section>
+
+  <section class="section">
+    <div class="section-no">01 / The finding</div>
+    <div class="section-head">
+      <h2>Employment exposure tells us where the industry matters. Risk tells us where workers are struggling.</h2>
+      <p>
+        Recent labor market research argues that employment structure alone can miss job loss dynamics.
+        Our county by industry estimates let us compare industry employment exposure with realized unemployment risk.
+      </p>
+    </div>
+
+    <div class="story-grid">
+      <div class="editorial-card">
+        <div class="metric-strip">
+          <div class="metric"><div class="num">1.35%</div><div class="lbl">Mesa 2024 estimated risk</div></div>
+          <div class="metric"><div class="num">53.9</div><div class="lbl">Rio Blanco energy specialization</div></div>
+          <div class="metric"><div class="num">+0.51 pp</div><div class="lbl">Mesa change from 2023</div></div>
+          <div class="metric"><div class="num">7</div><div class="lbl">counties in the comparison set</div></div>
+        </div>
+        <p class="smallcopy" style="margin-top:20px">
+          Rio Blanco is far more specialized in NAICS 21 employment than Mesa, yet Mesa's estimated 2024 unemployment risk is much higher.
+          That gap is the central insight of this use case. Employment share and specialization describe where an industry is important, while unemployment risk describes current labor market stress among workers in that industry.
+        </p>
+      </div>
+      <div class="pullquote">
+        <div class="quote">"Employment exposure and current unemployment risk are not interchangeable."</div>
+        <div class="qsmall">This is why a county by industry unemployment measure adds information that employment levels, shares, or specialization alone cannot provide.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-no">02 / See the difference</div>
+    <div class="section-head">
+      <h2>Specialization and unemployment risk point to different counties.</h2>
+      <p>Bubble size reflects local industry employment. Higher x values mean stronger energy specialization. Higher y values mean higher estimated 2024 unemployment risk.</p>
+    </div>
+
+    <div class="viz-grid">
+      <div class="viz-card">
+        <div class="viz-title">Energy employment specialization vs. unemployment risk</div>
+        <div class="viz-sub">Mesa leads on current risk. Rio Blanco leads on NAICS 21 employment specialization.</div>
+        <svg id="scatter" viewBox="0 0 650 470"></svg>
+      </div>
+
+      <div class="viz-card">
+        <div class="viz-title">Who faced the highest risk in 2024?</div>
+        <div class="viz-sub">A direct ranking among the selected counties.</div>
+        <div id="ranklist" class="ranklist"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-no">03 / Change over time</div>
+    <div class="section-head">
+      <h2>Risk increased in every selected county from 2023 to 2024.</h2>
+      <p>Mesa had the largest absolute increase. Percentage point change is shown so that tiny starting values do not look artificially dramatic.</p>
+    </div>
+
+    <div class="compare-card">
+      <div class="viz-title">2023 to 2024 unemployment risk</div>
+      <div class="viz-sub">Blue marks 2023. Orange marks 2024.</div>
+      <svg id="dumbbell" viewBox="0 0 1080 420"></svg>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-no">04 / County comparison</div>
+    <div class="section-head">
+      <h2>One table, three dimensions of transition exposure.</h2>
+      <p>Workforce size, specialization, and unemployment risk together give a more complete view of local labor market conditions.</p>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>County</th><th>Industry employment</th><th>Share of county jobs</th><th>Specialization</th>
+            <th>Risk 2023</th><th>Risk 2024</th><th>Change</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-no">05 / What to notice</div>
+    <div class="section-head">
+      <h2>Three patterns, three different policy questions.</h2>
+      <p>The same state contains several very different types of energy labor markets.</p>
+    </div>
+    <div class="insights">
+      <div class="insight"><h3>High employment exposure, lower current risk</h3><p>Rio Blanco and Moffat are highly specialized in NAICS 21 employment, yet their estimated 2024 unemployment risk remains relatively low.</p></div>
+      <div class="insight"><h3>Moderate employment exposure, higher current risk</h3><p>Mesa is less specialized in NAICS 21 employment than several rural counties in the comparison, but it has the highest estimated unemployment risk and the largest absolute increase.</p></div>
+      <div class="insight"><h3>Large industry workforce, moderate risk</h3><p>Weld has the largest NAICS 21 workforce in the comparison and high specialization, but its estimated risk is below Mesa and Denver.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-no">06 / Method</div>
+    <div class="section-head">
+      <h2>How we estimate unemployment risk.</h2>
+      <p>This is a descriptive website use case, not a causal estimate of the effect of energy transition.</p>
+    </div>
+
+    <div class="method-grid">
+      <div class="editorial-card">
+        <div class="formula">risk = predicted continued UI claimants / (predicted continued UI claimants + QCEW employment)</div>
+        <p class="smallcopy">Monthly predicted claimants are paired with the corresponding quarter's QCEW employment estimate. The measure reflects estimated continued UI unemployment risk, not the full unemployment rate.</p>
+      </div>
+      <div class="editorial-card">
+        <p class="smallcopy" style="margin-top:0">
+          <strong>What does "employment exposure" mean here?</strong><br>
+          We use two standard descriptive labor market measures from QCEW: the share of county employment in NAICS 21 and the NAICS 21 employment location quotient. These measure workforce presence and specialization. They are not a complete measure of community dependence, fiscal exposure, or transition vulnerability.
+        </p>
+        <p class="smallcopy">
+          <strong>Why Colorado?</strong><br>
+          Colorado contains counties with very different mining, oil and gas employment structures, alongside coal transition communities and large diversified metropolitan labor markets.
+          That makes it useful for comparing local structures while holding much of the institutional and policy environment constant.
+        </p>
+        <p class="smallcopy">
+          <strong>Selection rule:</strong> at least 250 workers in mining, quarrying, and oil and gas extraction and a 2024 employment location quotient above 2. This is only an illustrative screening rule for the demo, not a literature based definition of energy dependence or an energy community.
+          This is an illustrative screen for the website, not a federal definition of an energy community.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Context sources: Reuters, June 26, 2026; Colorado General Assembly, SB26-052; Associated Press, Dec. 5, 2025.
+    The analysis shown here uses predicted continued unemployment claims and QCEW employment. It does not claim that energy transition caused the observed unemployment risk.
+  </footer>
+
+</div>
+
+<script>
+const rows = [{"county": "Mesa", "geoid": "08077", "employment": 1525.75, "share": 2.28239, "lq": 7.012815, "risk2023": 0.839603, "risk2024": 1.352804, "change": 0.513201}, {"county": "Denver", "geoid": "08031", "employment": 5259.25, "share": 0.930537, "lq": 2.859936, "risk2023": 0.794257, "risk2024": 1.123767, "change": 0.32951}, {"county": "Weld", "geoid": "08123", "employment": 6577.083333, "share": 5.536639, "lq": 17.013372, "risk2023": 0.581438, "risk2024": 0.777639, "change": 0.196201}, {"county": "Garfield", "geoid": "08045", "employment": 961.583333, "share": 3.463912, "lq": 10.642277, "risk2023": 0.236275, "risk2024": 0.470097, "change": 0.233822}, {"county": "Rio Blanco", "geoid": "08103", "employment": 506.25, "share": 17.527474, "lq": 53.875589, "risk2023": 0.164504, "risk2024": 0.26929, "change": 0.104786}, {"county": "La Plata", "geoid": "08067", "employment": 393.333333, "share": 1.457942, "lq": 4.480911, "risk2023": 0.065676, "risk2024": 0.263362, "change": 0.197686}, {"county": "Moffat", "geoid": "08081", "employment": 355.75, "share": 7.561804, "lq": 23.245875, "risk2023": 0.02976, "risk2024": 0.095111, "change": 0.065351}];
+
+function svgEl(tag, attrs={}, text=""){
+  const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  if(text) e.textContent=text;
+  return e;
+}
+
+(function scatter(){
+  const svg=document.getElementById("scatter"),W=650,H=470,m={l:66,r:28,t:26,b:64};
+  const iw=W-m.l-m.r,ih=H-m.t-m.b,xMax=58,yMax=1.5;
+  const sx=x=>m.l+x/xMax*iw,sy=y=>m.t+ih-y/yMax*ih;
+  [0,10,20,30,40,50].forEach(v=>{
+    svg.appendChild(svgEl("line",{x1:sx(v),x2:sx(v),y1:m.t,y2:m.t+ih,class:"gridline"}));
+    svg.appendChild(svgEl("text",{x:sx(v),y:H-37,"text-anchor":"middle",class:"tick"},v));
+  });
+  [0,.3,.6,.9,1.2,1.5].forEach(v=>{
+    svg.appendChild(svgEl("line",{x1:m.l,x2:m.l+iw,y1:sy(v),y2:sy(v),class:"gridline"}));
+    svg.appendChild(svgEl("text",{x:m.l-10,y:sy(v)+4,"text-anchor":"end",class:"tick"},v.toFixed(1)));
+  });
+  svg.appendChild(svgEl("line",{x1:m.l,x2:m.l+iw,y1:m.t+ih,y2:m.t+ih,class:"axis"}));
+  svg.appendChild(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:m.t+ih,class:"axis"}));
+  svg.appendChild(svgEl("text",{x:m.l+iw/2,y:H-8,"text-anchor":"middle",class:"tick"},"NAICS 21 employment specialization (location quotient)"));
+  svg.appendChild(svgEl("text",{x:17,y:m.t+ih/2,"text-anchor":"middle",class:"tick",transform:`rotate(-90 17 ${m.t+ih/2})`},"Estimated 2024 unemployment risk (%)"));
+  const maxEmp=Math.max(...rows.map(d=>d.employment));
+  const offsets={"Mesa":[8,-8],"Denver":[8,22],"Weld":[8,-9],"Garfield":[8,-8],"Rio Blanco":[-12,-10],"La Plata":[8,20],"Moffat":[8,22]};
+  rows.forEach(d=>{
+    const r=6+19*Math.sqrt(d.employment/maxEmp);
+    svg.appendChild(svgEl("circle",{cx:sx(d.lq),cy:sy(d.risk2024),r,class:"bubble"}));
+    const [dx,dy]=offsets[d.county];
+    svg.appendChild(svgEl("text",{x:sx(d.lq)+dx,y:sy(d.risk2024)+dy,"text-anchor":dx<0?"end":"start",class:"label"},d.county));
+  });
+  const mesa=rows.find(d=>d.county==="Mesa"),rio=rows.find(d=>d.county==="Rio Blanco");
+  svg.appendChild(svgEl("line",{x1:sx(mesa.lq)+10,y1:sy(mesa.risk2024)+7,x2:sx(mesa.lq)+94,y2:sy(mesa.risk2024)+51,stroke:"#7d8790","stroke-width":1.2}));
+  svg.appendChild(svgEl("text",{x:sx(mesa.lq)+99,y:sy(mesa.risk2024)+55,class:"small"},"highest risk"));
+  svg.appendChild(svgEl("line",{x1:sx(rio.lq)-6,y1:sy(rio.risk2024)-4,x2:sx(rio.lq)-88,y2:sy(rio.risk2024)-46,stroke:"#7d8790","stroke-width":1.2}));
+  svg.appendChild(svgEl("text",{x:sx(rio.lq)-94,y:sy(rio.risk2024)-50,"text-anchor":"end",class:"small"},"highest specialization"));
+})();
+
+(function rank(){
+  const host=document.getElementById("ranklist"),max=Math.max(...rows.map(d=>d.risk2024));
+  [...rows].sort((a,b)=>b.risk2024-a.risk2024).forEach((d,i)=>{
+    const el=document.createElement("div");el.className="rankrow";
+    el.innerHTML=`<div class="ranknum">${i+1}</div><div class="rankname">${d.county}</div><div class="track"><div class="fill" style="width:${(d.risk2024/max*100).toFixed(1)}%"></div></div><div class="riskval">${d.risk2024.toFixed(2)}%</div>`;
+    host.appendChild(el);
+  });
+})();
+
+(function dumbbell(){
+  const svg=document.getElementById("dumbbell"),W=1080,H=420,m={l:120,r:160,t:35,b:45},iw=W-m.l-m.r,xMax=1.5;
+  const sx=x=>m.l+x/xMax*iw;
+  [0,.25,.5,.75,1,1.25,1.5].forEach(v=>{
+    svg.appendChild(svgEl("line",{x1:sx(v),x2:sx(v),y1:m.t,y2:H-m.b,class:"gridline"}));
+    svg.appendChild(svgEl("text",{x:sx(v),y:H-18,"text-anchor":"middle",class:"tick"},v.toFixed(2)));
+  });
+  const sorted=[...rows].sort((a,b)=>b.risk2024-a.risk2024),step=(H-m.t-m.b)/(sorted.length-1);
+  sorted.forEach((d,i)=>{
+    const y=m.t+i*step;
+    svg.appendChild(svgEl("text",{x:m.l-12,y:y+4,"text-anchor":"end",class:"label"},d.county));
+    svg.appendChild(svgEl("line",{x1:sx(d.risk2023),x2:sx(d.risk2024),y1:y,y2:y,stroke:"#52697f","stroke-width":4,"stroke-linecap":"round"}));
+    svg.appendChild(svgEl("circle",{cx:sx(d.risk2023),cy:y,r:6,fill:"#87a8ff"}));
+    svg.appendChild(svgEl("circle",{cx:sx(d.risk2024),cy:y,r:7,fill:"#e87545"}));
+    svg.appendChild(svgEl("text",{x:sx(d.risk2024)+10,y:y+4,class:"label"},d.risk2024.toFixed(2)+"%"));
+    svg.appendChild(svgEl("text",{x:W-110,y:y+4,class:"small"},"+"+d.change.toFixed(2)+" pp"));
+  });
+  svg.appendChild(svgEl("text",{x:W-110,y:18,class:"small"},"Change"));
+})();
+
+(function table(){
+  const tbody=document.getElementById("tbody");
+  [...rows].sort((a,b)=>b.risk2024-a.risk2024).forEach(d=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><strong>${d.county}</strong><br><span class="badge">${d.geoid}</span></td>
+      <td>${Math.round(d.employment).toLocaleString()}</td>
+      <td>${d.share.toFixed(1)}%</td>
+      <td>${d.lq.toFixed(1)}</td>
+      <td>${d.risk2023.toFixed(2)}%</td>
+      <td class="riskhi">${d.risk2024.toFixed(2)}%</td>
+      <td>+${d.change.toFixed(2)} pp</td>`;
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>

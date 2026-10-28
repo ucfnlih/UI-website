@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When a Plant Goes Idle — Boone County, Illinois</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,72,400;0,72,500;0,72,600;1,72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#EFECE4;
+    --paper-2:#E7E3D8;
+    --ink:#1C2024;
+    --ink-soft:#4A4F55;
+    --steel:#2B5C82;
+    --steel-light:#9CB4C4;
+    --rust:#A8462E;
+    --brass:#8C7A4F;
+    --line:#CFC7B6;
+    --paper-on-ink:#EDE9DE;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+  }
+  a{color:var(--steel);}
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 40px;
+  }
+  .col{
+    max-width:640px;
+  }
+  .col.center{margin:0 auto;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--ink);
+    color:var(--paper-on-ink);
+    padding:120px 0 90px;
+  }
+  .hero h1{
+    font-size:clamp(2.1rem, 4.4vw, 3.4rem);
+    line-height:1.14;
+    color:#fff;
+    max-width:780px;
+  }
+  .hero p.sub{
+    max-width:620px;
+    font-size:1.13rem;
+    color:#C9C4B7;
+    margin-top:28px;
+  }
+  .hero .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    color:var(--steel-light);
+    margin-bottom:22px;
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:76px 0;}
+  section.what-happened{
+    padding-top:70px;
+    padding-bottom:56px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.85rem;
+    color:var(--brass);
+    margin-bottom:10px;
+  }
+  h2.section-title{
+    font-size:clamp(1.6rem, 2.6vw, 2.1rem);
+    margin-bottom:20px;
+  }
+  .lede{
+    font-size:1.06rem;
+    color:var(--ink-soft);
+  }
+  .evidence{
+    border-bottom:1px solid var(--line);
+  }
+  .evidence:last-of-type{border-bottom:none;}
+
+  /* ---------- CHART PANEL ---------- */
+  .chart-panel{
+    margin:44px 0 30px;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:28px 26px 18px;
+  }
+  .chart-panel .panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .chart-panel .panel-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+  .chart-canvas-wrap{
+    position:relative;
+    height:380px;
+    margin-top:14px;
+  }
+  @media (max-width:640px){
+    .chart-canvas-wrap{height:320px;}
+  }
+
+  .stat-line{
+    display:flex;
+    gap:34px;
+    flex-wrap:wrap;
+    margin:26px 0 6px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .stat{
+    min-width:150px;
+  }
+  .stat .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:1.5rem;
+    color:var(--rust);
+    display:block;
+  }
+  .stat .cap{
+    font-size:0.86rem;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+
+  .takeaway{
+    font-size:1.02rem;
+    color:var(--ink);
+    margin-top:26px;
+    max-width:640px;
+  }
+  .takeaway strong{color:var(--steel);}
+
+  /* ---------- CLOSING ---------- */
+  .closing{
+    background:var(--ink);
+    color:var(--paper-on-ink);
+    padding:80px 0 60px;
+  }
+  .closing h2{
+    color:#fff;
+    font-size:clamp(1.5rem,2.4vw,2rem);
+    max-width:700px;
+  }
+  .closing p{
+    color:#C9C4B7;
+    max-width:640px;
+    margin-top:20px;
+    font-size:1.02rem;
+  }
+  .closing a{
+    color:#fff;
+    border-bottom:1px solid var(--steel-light);
+    text-decoration:none;
+  }
+  footer{
+    padding:26px 0 50px;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:720px){
+    .wrap{padding:0 22px;}
+    .hero{padding:80px 0 60px;}
+    section{padding:52px 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">Boone County, Illinois — Case Study</div>
+    <h1>A plant went idle. Illinois barely noticed.</h1>
+    <p class="sub">The Belvidere Assembly Plant was indefinitely idled on February 28, 2023, laying off more than a thousand manufacturing workers in a single month. In the state's official numbers, almost nothing happened.</p>
+  </div>
+</div>
+
+<section class="what-happened">
+  <div class="wrap">
+    <div class="col">
+      <div class="eyebrow-num">What happened</div>
+      <p class="lede" style="color:var(--ink); font-size:1.06rem;">The Stellantis Belvidere Assembly Plant, located in Belvidere, Boone County, Illinois, was indefinitely idled at the end of February 2023, resulting in large-scale layoffs of workers at the Jeep manufacturing facility. Because the plant was a major manufacturing employer in the local economy, the shutdown created a highly concentrated employment shock in Boone County and the broader Rockford metropolitan area, particularly in the manufacturing sector.</p>
+      <p class="lede">What follows are three ways of measuring that shock — by geography, by sector, and by data source — and what each one reveals or hides.</p>
+    </div>
+  </div>
+</section>
+
+<section class="evidence">
+  <div class="wrap">
+    <div class="col">
+      <div class="eyebrow-num">Evidence 01 — Geography</div>
+      <h2 class="section-title">The shock fades as the map zooms out</h2>
+      <p class="lede">Manufacturing unemployment risk, tracked at three levels of aggregation around the same event: Boone County itself, the Rockford metro area it belongs to, and the state of Illinois. Click a line in the legend to isolate it.</p>
+    </div>
+
+    <div class="chart-panel">
+      <div class="panel-head">
+        <span class="panel-label">Unemployment risk · Manufacturing (NAICS 31) · monthly</span>
+        <span class="panel-label">Oct 2022 – Oct 2023</span>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="chart1"></canvas></div>
+    </div>
+
+    <div class="col">
+      <div class="stat-line">
+        <div class="stat"><span class="num">8.8%</span><span class="cap">Boone County, peak (May 2023)</span></div>
+        <div class="stat"><span class="num">4.8%</span><span class="cap">Rockford metro, same month</span></div>
+        <div class="stat"><span class="num">1.7%</span><span class="cap">Illinois, same month</span></div>
+      </div>
+      <p class="takeaway">At its peak, manufacturing unemployment risk in <strong>Boone County</strong> ran roughly <strong>five times</strong> the state figure and <strong>almost double</strong> the metro figure. Illinois's statewide manufacturing number moved by about a percentage point all year — the kind of month-to-month noise a state economist would not think twice about.</p>
+    </div>
+  </div>
+</section>
+
+<section class="evidence">
+  <div class="wrap">
+    <div class="col">
+      <div class="eyebrow-num">Evidence 02 — Sector</div>
+      <h2 class="section-title">Even inside the county, blending sectors erases the signal</h2>
+      <p class="lede">Boone County's economy is not only manufacturing. Combine every sector's claims and employment into one county-level number, and compare it against manufacturing alone.</p>
+    </div>
+
+    <div class="chart-panel">
+      <div class="panel-head">
+        <span class="panel-label">Unemployment risk · Boone County · monthly</span>
+        <span class="panel-label">Oct 2022 – Oct 2023</span>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="chart2"></canvas></div>
+    </div>
+
+    <div class="col">
+      <div class="stat-line">
+        <div class="stat"><span class="num">8.8%</span><span class="cap">Manufacturing sector alone, peak</span></div>
+        <div class="stat"><span class="num">0.16%</span><span class="cap">All sectors combined, same month</span></div>
+        <div class="stat"><span class="num">~56×</span><span class="cap">how much the shock is diluted</span></div>
+      </div>
+      <p class="takeaway">Both lines sit on the same axis on purpose: at county-wide resolution, the shutdown all but disappears into a number fifty-some times smaller than the sector figure it is built from — visually, into a nearly flat line along the bottom of the chart. <strong>County-level data alone is not enough</strong> — the sector breakdown is where the shock actually lives.</p>
+    </div>
+  </div>
+</section>
+
+<section class="evidence">
+  <div class="wrap">
+    <div class="col">
+      <div class="eyebrow-num">Evidence 03 — Timing</div>
+      <h2 class="section-title">Payroll data finds out five months late</h2>
+      <p class="lede">Unemployment risk is built from claims people file the week they lose work. Employment counts (EMP) come from employer payroll reports on a slower cycle. The shaded band marks how long it took the payroll count to catch up with what claims already showed.</p>
+    </div>
+
+    <div class="chart-panel">
+      <div class="panel-head">
+        <span class="panel-label">Manufacturing (NAICS 31), Boone County</span>
+        <span class="panel-label">Oct 2022 – Oct 2023</span>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="chart3"></canvas></div>
+    </div>
+
+    <div class="col">
+      <div class="stat-line">
+        <div class="stat"><span class="num">1 mo.</span><span class="cap">for claims-based risk to jump 6×</span></div>
+        <div class="stat"><span class="num">5 mo.</span><span class="cap">for payroll employment to reflect it</span></div>
+        <div class="stat"><span class="num">−42%</span><span class="cap">total EMP decline, Feb → Oct 2023</span></div>
+      </div>
+      <p class="takeaway">By March 2023, one month after the plant idled, claims-based risk had already jumped six-fold. Payroll employment barely moved — it did not show a comparable decline until <strong>July</strong>, five months later. Anyone watching only the payroll count would have missed the shock for most of a two-quarter window.</p>
+    </div>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="wrap">
+    <h2>None of this is hidden in an exotic corner of the data. It's the default resolution of the two most-cited labor statistics: state unemployment and employer payroll counts.</h2>
+    <p>Recovering the signal takes claims data at the county-by-sector level, updated on a monthly cycle — which is what the Resilient Economy Lab's unemployment insurance dataset is built to provide, including for states where that resolution has to be modeled rather than observed directly.</p>
+    <p><a href="https://ucfnlih.github.io/UI-website" target="_blank" rel="noopener">Explore the full county-level dataset</a></p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    The Resilient Economy Lab, University of Pittsburgh. Data: BLS QCEW, ETA 203, state UI claims. Funded in part by the Alfred P. Sloan Foundation (g-2025-25158).
+  </div>
+</footer>
+
+<script>
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.color = '#4A4F55';
+
+const months = ['Oct 2022','Nov 2022','Dec 2022','Jan 2023','Feb 2023','Mar 2023','Apr 2023','May 2023','Jun 2023','Jul 2023','Aug 2023','Sep 2023','Oct 2023'];
+const EVENT_INDEX = 4; // Feb 2023
+
+// ---- Data (from case1_geo_comparison.csv / case2_overall.csv / case3_emp_vs_risk.csv) ----
+const boone = [0.01670988188,0.01509322285,0.01339163706,0.01442873969,0.01284348865,0.0775439608,0.08060230292,0.08797393365,0.0553390491,0.08406893653,0.08443496802,0.04605263158,0.03888334995];
+const msa   = [0.01208774233,0.01143607773,0.01111195677,0.01104548592,0.01177640132,0.04505840905,0.04697434363,0.04760656229,0.03797142962,0.03768026051,0.03768824717,0.02115224047,0.01897518014];
+const state = [0.01086721444,0.01075620198,0.01132811962,0.01407557914,0.0166688562,0.01892522927,0.01692615536,0.01660771081,0.02062876168,0.01960960798,0.01405019391,0.01472772679,0.01783993447];
+const overall = [0.0004502489274,0.0005545945138,0.001187769276,0.001622225536,0.001731116009,0.002209714739,0.00190141403,0.001566418797,0.001345296435,0.001179388152,0.001290811005,0.0006618542291,0.000704845308];
+const emp = [3413,3328,3610,3347,3305,3200,3114,3079,3636,2179,2147,2030,1928];
+const risk3 = boone; // same series as sector-31 Boone risk
+
+// ---- shared plugin: dashed event line ----
+const eventLinePlugin = {
+  id: 'eventLine',
+  afterDatasetsDraw(chart){
+    const {ctx, chartArea, scales} = chart;
+    const x = scales.x.getPixelForValue(EVENT_INDEX);
+    ctx.save();
+    ctx.strokeStyle = '#8C7A4F';
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath();
+    ctx.moveTo(x, chartArea.top);
+    ctx.lineTo(x, chartArea.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#8C7A4F';
+    ctx.font = "11px 'IBM Plex Mono', monospace";
+    ctx.textAlign = 'left';
+    ctx.fillText('Plant idled, Feb 28', x + 7, chartArea.top + 13);
+    ctx.restore();
+  }
+};
+
+// ---- lag-shading plugin for chart 3 (Mar–Jul 2023) ----
+const lagShadePlugin = {
+  id: 'lagShade',
+  beforeDatasetsDraw(chart){
+    const {ctx, chartArea, scales} = chart;
+    const x0 = scales.x.getPixelForValue(5); // Mar 2023
+    const x1 = scales.x.getPixelForValue(9); // Jul 2023
+    ctx.save();
+    ctx.fillStyle = 'rgba(168, 70, 46, 0.08)';
+    ctx.fillRect(x0, chartArea.top, x1 - x0, chartArea.bottom - chartArea.top);
+    ctx.restore();
+  }
+};
+
+const baseGrid = { color: '#DAD4C4', drawTicks:false };
+const baseX = { grid: {display:false}, ticks:{ maxRotation:0, autoSkip:true, font:{size:11} } };
+
+function pct(v){ return (v*100).toFixed(1) + '%'; }
+
+// ---- Chart 1: geography ----
+new Chart(document.getElementById('chart1'), {
+  type:'line',
+  data:{
+    labels: months,
+    datasets:[
+      { label:'Boone County', data:boone, borderColor:'#2B5C82', backgroundColor:'#2B5C82', borderWidth:3, pointRadius:3, tension:0.15 },
+      { label:'Rockford, IL metro', data:msa, borderColor:'#A8462E', backgroundColor:'#A8462E', borderWidth:2, borderDash:[6,3], pointRadius:2, tension:0.15 },
+      { label:'Illinois (state)', data:state, borderColor:'#1C2024', backgroundColor:'#1C2024', borderWidth:2, pointRadius:2, tension:0.15 }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{ mode:'index', intersect:false },
+    plugins:{
+      legend:{ position:'top', align:'start', labels:{ boxWidth:14, boxHeight:2, padding:18, font:{size:12.5} } },
+      tooltip:{ callbacks:{ label: ctx => `${ctx.dataset.label}: ${pct(ctx.parsed.y)}` } }
+    },
+    scales:{
+      x: baseX,
+      y:{ grid: baseGrid, ticks:{ callback:v=>pct(v), font:{size:11} } }
+    }
+  },
+  plugins:[eventLinePlugin]
+});
+
+// ---- Chart 2: sector vs overall (dual axis) ----
+new Chart(document.getElementById('chart2'), {
+  type:'line',
+  data:{
+    labels: months,
+    datasets:[
+      { label:'Manufacturing (sector 31)', data:boone, borderColor:'#2B5C82', backgroundColor:'#2B5C82', borderWidth:3, pointRadius:3, tension:0.15, yAxisID:'y' },
+      { label:'Overall (Boone County)', data:overall, borderColor:'#1C2024', backgroundColor:'#1C2024', borderWidth:2, pointRadius:2, tension:0.15, yAxisID:'y' }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{ mode:'index', intersect:false },
+    plugins:{
+      legend:{ position:'top', align:'start', labels:{ boxWidth:14, boxHeight:2, padding:18, font:{size:12.5} } },
+      tooltip:{ callbacks:{ label: ctx => `${ctx.dataset.label}: ${pct(ctx.parsed.y)}` } }
+    },
+    scales:{
+      x: baseX,
+      y:{ position:'left', grid: baseGrid, ticks:{ callback:v=>pct(v), font:{size:11} }, title:{display:true,text:'Unemployment risk', font:{size:11}} }
+    }
+  },
+  plugins:[eventLinePlugin]
+});
+
+// ---- Chart 3: risk vs EMP (dual axis + lag shading) ----
+new Chart(document.getElementById('chart3'), {
+  type:'line',
+  data:{
+    labels: months,
+    datasets:[
+      { label:'Unemployment risk (claims-based)', data:risk3, borderColor:'#2B5C82', backgroundColor:'#2B5C82', borderWidth:3, pointRadius:3, tension:0.15, yAxisID:'y' },
+      { label:'Employment, EMP (payroll-based)', data:emp, borderColor:'#A8462E', backgroundColor:'#A8462E', borderWidth:2, pointRadius:2, tension:0.15, yAxisID:'y2' }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{ mode:'index', intersect:false },
+    plugins:{
+      legend:{ position:'top', align:'start', labels:{ boxWidth:14, boxHeight:2, padding:18, font:{size:12.5} } },
+      tooltip:{ callbacks:{ label: ctx => ctx.dataset.yAxisID==='y' ? `${ctx.dataset.label}: ${pct(ctx.parsed.y)}` : `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}` } }
+    },
+    scales:{
+      x: baseX,
+      y:{ position:'left', grid: baseGrid, ticks:{ callback:v=>pct(v), font:{size:11}, color:'#2B5C82' }, title:{display:true,text:'Risk', color:'#2B5C82', font:{size:11}} },
+      y2:{ position:'right', grid:{display:false}, ticks:{ font:{size:11}, color:'#A8462E' }, title:{display:true,text:'EMP', color:'#A8462E', font:{size:11}} }
+    }
+  },
+  plugins:[lagShadePlugin, eventLinePlugin]
+});
+</script>
+
+</body>
+</html>
